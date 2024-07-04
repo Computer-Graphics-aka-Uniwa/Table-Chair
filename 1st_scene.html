@@ -56,7 +56,61 @@
 			}
 
 			function initShaders() {
+				var vertexShaderSource = document.getElementById("vShader").text;
+				var fragmentShaderSource = document.getElementById("fshader").text;
+				var vertexShader = createCompileShader(gl.VERTEX_SHADER, vertexShaderSource);
+				var fragmentShader = createCompileShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
+				shadersProgram = gl.createProgram();
+				gl.attachShader(shadersProgram, vertexShader);
+				gl.attachShader(shadersProgram, fragmentShader);
+				gl.linkProgram(shadersProgram);
+				if (!gl.getProgramParameter(shadersProgram, gl.LINK_STATUS)) {
+					alert("Error linking shaders program: " + gl.getProgramInfoLog(shadersProgram));
+				}
+				gl.useProgram(shadersProgram);
+				vertexPositionAttributePointer = gl.getAttribLocation(shadersProgram, "aVertexPosition");
+				gl.enableVertexAttribArray(vertexPositionAttributePointer);
 			}
+
+			function initBuffers() {
+				var triangleVertices = new Float32Array([
+					0.5, 0.5, 0.5, 1.0,
+					0.5, -0.5, 0.5, 1.0,
+					-0.5, -0.5, 0.5, 1.0
+				]);
+				vertexBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+				gl.bufferData(gl.ARRAY_BUFFER, triangleVertices, gl.STATIC_DRAW);
+				vertexBuffer.itemSize = 4;
+				vertexBuffer.itemCount = 3;
+			}
+
+			function drawScene() {
+				gl.viewport(0, 0, canvas.width, gl.drawingBufferHeight);
+				gl.clear(gl.COLOR_BUFFER_BIT);
+				gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+				gl.vertexAttribPointer(vertexPositionAttributePointer, vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+				gl.drawArrays(gl.TRIANGLEs, 0, vertexBuffer.itemCount);
+			}
+
+			function main() {
+				var minDimension = Math.min(window.innerHeight, window.innerWidth);
+				canvas = document.getElementById("canvas");
+				canvas.width = 0.95 * minDimension;
+				canvas.height = 0.95 * minDimension;
+				gl = createWebGlContext(canvas);
+				initShaders();
+				initBuffers();
+				gl.clearColor(0.5, 0.5, 0.5, 1.0);
+				drawScene();
+			} 
 		</script>
+
 	</head>
+
+	<body onload="main()">
+		<canvas id="canvas">
+
+		</canvas>
+	</body>
 </html>
