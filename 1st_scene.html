@@ -1,71 +1,230 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finals-Exercise</title>
-</head>
-<body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-	
-	    // JavaScript to set the background color
-        document.body.style.backgroundColor = 'grey';
+<meta charset="UTF-8">
+<script src="webgl-debug.js"></script>
+<script src="gl-matrix-min.js"></script>
 
-		// Create a scene
-		const scene = new THREE.Scene();
 
-		// Create a camera
-		const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-		camera.position.set(0, 0, 0);
-
-		// Create a renderer
-		const renderer = new THREE.WebGLRenderer();  //  responsible for rendering 3D graphics using WebGL, a JavaScript API for rendering interactive 2D and 3D graphics in a web browser.
-		renderer.setSize(window.innerWidth, window.innerHeight); // sets the renderer's size accordingly. This ensures that the rendered output fits the entire browser window.
-		document.body.appendChild(renderer.domElement); // adds the renderer's canvas element to the document body.
-
-		// Create geometry
-		const geometry = new THREE.Geometry(); //  represents a 3D object. It contains all the vertices and faces that define the object's shape.
-		geometry.vertices.push(
-			new THREE.Vector3(-1, -1, -1),
-			new THREE.Vector3(1, -1, -1),
-			new THREE.Vector3(1, 1, -1),
-			new THREE.Vector3(-1, 1, -1),
-			new THREE.Vector3(-1, -1, 1),
-			new THREE.Vector3(1, -1, 1),
-			new THREE.Vector3(1, 1, 1),
-			new THREE.Vector3(-1, 1, 1)
-		);
-
-		geometry.faces.push(
-			new THREE.Face3(0, 1, 2),
-			new THREE.Face3(0, 2, 3),
-			new THREE.Face3(4, 6, 5),
-			new THREE.Face3(4, 7, 6),
-			new THREE.Face3(0, 4, 1),
-			new THREE.Face3(1, 4, 5),
-			new THREE.Face3(1, 5, 2),
-			new THREE.Face3(2, 5, 6),
-			new THREE.Face3(2, 6, 3),
-			new THREE.Face3(3, 6, 7),
-			new THREE.Face3(3, 7, 0),
-			new THREE.Face3(0, 7, 4)
-		);
-
-		// Create material
-		const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); //  determines how the object's surface is rendered when light hits it.
-
-		// Create mesh
-		const cube = new THREE.Mesh(geometry, material); //  combines the geometry and material to create a 3D cube.
-		scene.add(cube);                                 // adds the cube to the scene.
-
-		// Animation loop
-		function animate() {
-			requestAnimationFrame(animate);
-
-			renderer.render(scene, camera);
-		}
-		animate();
+    <script id="vShader" type="x-shader/x-vertex">
+        attribute vec4 aVertexPosition; 
+        attribute vec4 aVertexColor; 
+        uniform mat4 uPerspectiveViewMatrix;
+        varying vec4 vColor; 
+        void main() {
+            gl_Position = uPerspectiveViewMatrix * aVertexPosition; 
+            vColor = aVertexColor;
+        }    
     </script>
+    
+    <script id="fShader" type="x-shader/x-fragment">
+        precision mediump float; 
+        varying vec4 vColor; 
+        void main() {
+            gl_FragColor = vColor;
+        }
+    </script>
+
+    <script>
+        var gl; 
+        var canvas; 
+        var shadersProgram; 
+        var vertexPositionAttributePointer; 
+        var vertexColorAttributePointer;
+        var verticesTransformUniformPointer; 
+        var vertexBuffer;
+        var colorBuffer; 
+        var indexBuffer;
+        var totalAngle = 0.0; 
+        var requestID = 0; 
+        var viewMatrix = new Float32Array(16);
+        var perspectiveMatrix = new Float32Array(16);
+        var pvMatrix = new Float32Array(16);
+        var perspectiveViewUniformPointer;
+        
+    function createGLContext(inCanvas) {
+	var outContext = null;
+	outContext = inCanvas.getContext("webgl");
+		if (!outContext)
+			outContext = inCanvas.getContext("experimental-webgl"); 
+		if (!outContext) 
+			alert("WebGL rendering context creation error.");
+ 
+	return outContext;
+    }
+
+    function createCompileShader(shaderType, shaderSource) {
+        var outShader = gl.createShader(shaderType);
+        gl.shaderSource(outShader, shaderSource); 
+        gl.compileShader(outShader); 
+        if (!gl.getShaderParameter(outShader, gl.COMPILE_STATUS)) { 
+            alert( "Shader compilation error. " + gl.getShaderInfoLog(outShader) ); 
+            gl.deleteShader(outShader);
+            outShader = null;
+        }
+        return outShader;
+    }
+
+    function initShaders() {
+        var vertexShaderSource = document.getElementById("vShader").textContent; 
+        var fragmentShaderSource = document.getElementById("fShader").textContent; 
+        var vertexShader = createCompileShader(gl.VERTEX_SHADER, vertexShaderSource); 
+        var fragmentShader = createCompileShader(gl.FRAGMENT_SHADER, fragmentShaderSource); 
+        shadersProgram = gl.createProgram(); 
+        gl.attachShader(shadersProgram, vertexShader); 
+        gl.attachShader(shadersProgram, fragmentShader); 
+        gl.linkProgram(shadersProgram); 
+        if (!gl.getProgramParameter(shadersProgram, gl.LINK_STATUS)) { 
+            alert("Shaders linking error.");
+        }
+        gl.useProgram(shadersProgram); 
+        vertexPositionAttributePointer = 	gl.getAttribLocation(shadersProgram, "aVertexPosition"); 
+        gl.enableVertexAttribArray(vertexPositionAttributePointer); 
+        vertexColorAttributePointer = gl.getAttribLocation(shadersProgram, "aVertexColor"); 
+        gl.enableVertexAttribArray(vertexColorAttributePointer); 
+        verticesTransformUniformPointer = gl.getUniformLocation(shadersProgram, "uVerticesTransform"); 
+    }
+
+    function initBuffers() {
+
+    var cubePositions = new Float32Array ([
+        
+        -0.4, -0.4, 0.4, 1.0,
+        0.4, -0.4, 0.4, 1.0,
+        0.4, 0.4, 0.4, 1.0,
+        -0.4, 0.4, 0.4, 1.0,
+
+        0.4, -0.4, -0.4, 1.0,
+        0.4, -0.4, 0.4, 1.0,
+        0.4, 0.4, 0.4, 1.0,
+        0.4, 0.4, -0.4, 1.0,
+
+        0.4, -0.4, -0.4, 1.0,
+        -0.4, -0.4, -0.4, 1.0,
+        -0.4, 0.4, -0.4, 1.0,
+        0.4,  0.4, -0.4, 1.0,
+        
+        -0.4, -0.4, -0.4, 1.0,
+        -0.4, -0.4, 0.4, 1.0,
+        -0.4, 0.4, 0.4, 1.0,
+        -0.4, 0.4, -0.4, 1.0,
+        
+        -0.4, -0.4, 0.4, 1.0,
+        0.4, -0.4, 0.4, 1.0,
+        0.4, -0.4, -0.4, 1.0,
+        -0.4, -0.4, -0.4, 1.0,
+        
+        -0.4, 0.4, 0.4, 1.0,
+        0.4, 0.4, 0.4, 1.0,
+        0.4, 0.4, -0.4, 1.0,
+        -0.4,  0.4, -0.4, 1.0
+    ]);
+
+    vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, cubePositions, gl.STATIC_DRAW);
+    vertexBuffer.itemSize = 4;
+    vertexBuffer.numItems = 24;
+
+    var cubeColors = new Float32Array([
+        0.0, 0.0, 0.3, 1.0,
+        0.0, 0.0, 0.3, 1.0,
+        0.0, 0.0, 0.3, 1.0,
+        0.0, 0.0, 0.3, 1.0,
+
+        0.0, 0.0, 0.1, 1.0,
+        0.0, 0.0, 0.1, 1.0,
+        0.0, 0.0, 0.1, 1.0,
+        0.0, 0.0, 0.1, 1.0,
+        
+        0.0, 0.0, 0.6, 1.0,
+        0.0, 0.0, 0.6, 1.0,
+        0.0, 0.0, 0.6, 1.0,
+        0.0, 0.0, 0.6, 1.0,
+        
+        0.0, 0.0, 1.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
+        
+        0.0, 0.0, 0.8, 1.0,
+        0.0, 0.0, 0.8, 1.0,
+        0.0, 0.0, 0.8, 1.0,
+        0.0, 0.0, 0.8, 1.0,
+        
+        0.0, 0.0, 0.5, 1.0,
+        0.0, 0.0, 0.5, 1.0,
+        0.0, 0.0, 0.5, 1.0,
+        0.0, 0.0, 0.5, 1.0
+    ]);
+
+    colorBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, cubeColors, gl.STATIC_DRAW);
+    colorBuffer.itemSize = 4;
+    colorBuffer.numItems = 24;
+
+    indexBuffer = gl.createBuffer();
+    var indexMatrix = new Uint16Array([
+        0, 1, 2, 0, 2, 3,
+        4, 5, 6, 4, 6, 7,
+        8, 9, 10, 8, 10, 11,
+        12, 13, 14, 12, 14, 15,
+        16, 17, 18, 16, 18, 19,
+        20, 21, 22, 20, 22, 23
+    ]);
+    indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexMatrix, gl.STATIC_DRAW);
+    indexBuffer.itemSize = 1;
+    indexBuffer.numItems = 36;
+
+    }
+
+    function drawScene() {
+
+    gl.useProgram(shadersProgram);
+
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.vertexAttribPointer(vertexPositionAttributePointer, vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.vertexAttribPointer(vertexColorAttributePointer, colorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    glMatrix.mat4.lookAt(viewMatrix, [9,9,9], [0,0,0], [0,0,1]);
+    glMatrix.mat4.perspective(perspectiveMatrix, 80 * Math.PI / 180, 1, 0.01, 1000);
+    glMatrix.mat4.multiply(pvMatrix, perspectiveMatrix, viewMatrix);
+    
+    perspectiveViewUniformPointer = gl.getUniformLocation(shadersProgram, "uPerspectiveViewMatrix");
+    gl.uniformMatrix4fv(perspectiveViewUniformPointer, false, pvMatrix);
+    gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+    
+    
+    }
+
+    function main() {
+        var minDimension;
+        minDimension = Math.min(window.innerHeight, window.innerWidth);
+        canvas = document.getElementById("sceneCanvas"); 
+        canvas.width = 0.9*minDimension; 
+        canvas.height = 0.9*minDimension; 
+        gl = WebGLDebugUtils.makeDebugContext(createGLContext(canvas));
+        initShaders(); 
+        initBuffers(); 
+        gl.clearColor(0.3, 0.3, 0.3, 1.0); 
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+        gl.enable(gl.DEPTH_TEST);
+        drawScene(); 
+    }
+    </script>
+
+</head>
+<body onload="main()">
+<canvas id="sceneCanvas">
+</canvas>
 </body>
 </html>
+
