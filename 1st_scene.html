@@ -73,16 +73,43 @@
 			}
 
 			function initBuffers() {
-				var triangleVertices = new Float32Array([
-					0.5, 0.5, 0.5, 1.0,
-					0.5, -0.5, 0.5, 1.0,
-					-0.5, -0.5, 0.5, 1.0
+				var cubeVertices = new Float32Array([
+					// back face
+					-1.0, -1.0, 1.0, 1.0,
+					1.0, -1.0, 1.0, 1.0,
+					1.0, 1.0, 1.0, 1.0,
+					-1.0, 1.0, 1.0, 1.0,	
+					// right face
+					1.0, -1.0, -1.0, 1.0,
+					1.0, -1.0, 1.0, 1.0,
+					1.0, 1.0, 1.0, 1.0,
+					1.0, 1.0, -1.0, 1.0,
+					// front face
+					-1.0, -1.0, -1.0, 1.0,
+					-1.0, -1.0, -1.0, 1.0,
+					-1.0, 1.0, -1.0, 1.0,
+					-1.0, 1.0, -1.0, 1.0,
+					// left face
+					-1.0, -1.0, -1.0, 1.0,
+					-1.0, -1.0, 1.0, 1.0,
+					-1.0, 1.0, 1.0, 1.0,
+					-1.0, 1.0, -1.0, 1.0,
+					// top face
+					-1.0, 1.0, 1.0, 1.0,
+					1.0, 1.0, 1.0, 1.0,
+					1.0, 1.0, -1.0, 1.0,
+					-1.0, 1.0, -1.0, 1.0,
+					// bottom face
+					-1.0, -1.0, 1.0, 1.0,
+					1.0, -1.0, 1.0, 1.0,
+					1.0, -1.0, -1.0, 1.0,
+					-1.0, -1.0, -1.0, 1.0
 				]);
 				vertexBuffer = gl.createBuffer();
 				gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-				gl.bufferData(gl.ARRAY_BUFFER, triangleVertices, gl.STATIC_DRAW);
+				gl.bufferData(gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
 				vertexBuffer.itemSize = 4;
-				vertexBuffer.itemCount = 3;
+				vertexBuffer.itemCount = 24;
 			}
 
 			function drawScene() {
