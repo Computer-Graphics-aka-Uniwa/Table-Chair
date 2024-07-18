@@ -84,7 +84,7 @@
 				gl.enableVertexAttribArray(vertexColorAttributePointer);
 				verticesTransformUniformPointer = gl.getUniformLocation(shadersProgram, "uVerticesTransform");
 			}
-
+			// === [STEP 1] ===
 			function initBuffers() {
 				var cubePositions = new Float32Array ([
 					// Back
@@ -191,7 +191,7 @@
 				
 				gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 				gl.vertexAttribPointer(vertexColorAttributePointer, colorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-				// === STEP 2 === 
+				// === [STEP 2] === 
 				glMatrix.mat4.lookAt(viewMatrix, [9,9,9], [0,0,0], [0,0,1]);
 				glMatrix.mat4.perspective(perspectiveMatrix, 80 * Math.PI / 180, 1, 0.01, 1000);
 				glMatrix.mat4.multiply(pvMatrix, perspectiveMatrix, viewMatrix);
