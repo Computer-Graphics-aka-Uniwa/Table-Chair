@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<script src="webgl-debug.js"></script>
-		<script src="gl-matrix-min.js"></script>
+		<script src="WebGL-Libraries/gl-matrix-min.js"></script>
+		<script src="WebGL-Libraries/webgl-debug.js"></script>
 
 		<script id="vShader" type="x-shader/x-vertex">
 			attribute vec4 aVertexPosition;
@@ -192,7 +192,8 @@
 				
 				gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 				gl.vertexAttribPointer(vertexColorAttributePointer, colorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
+				
+				// Σε περίπτωση που ο χρήστης δεν πατάει το κουμπί "Επανασχεδίασε" βάλε τις default τιμές
 				if (!isRedraw) {
 					glMatrix.mat4.lookAt(viewMatrix, [9,9,9], [0,0,0], [0,0,1]);
 					glMatrix.mat4.perspective(perspectiveMatrix, 80 * Math.PI / 180, 1, 0.01, 1000);
@@ -239,7 +240,8 @@
 						cameraPositionCoordinates = [viewDistance, -viewDistance, -viewDistance];
 						break;
 				}
-
+				
+				// Ζωγραφίζουμε ξανά την σκηνή με τις επιλεγμένες τιμές του χρήστη
 				glMatrix.mat4.lookAt(viewMatrix, cameraPositionCoordinates, [0,0,0], [0,0,1]);
 				glMatrix.mat4.perspective(perspectiveMatrix, viewAngle * Math.PI / 180, 1, 0.01, viewAngle * 100);
 				isRedraw = true;
