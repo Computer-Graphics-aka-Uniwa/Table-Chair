@@ -36,6 +36,7 @@
 			var indexBuffer;
 			var totalAngle = 0.0;
 			var requestID = 0;
+			var isRedraw = false;
 			var viewMatrix = new Float32Array(16);
 			var perspectiveMatrix = new Float32Array(16);
 			var pvMatrix = new Float32Array(16);
@@ -84,7 +85,7 @@
 				gl.enableVertexAttribArray(vertexColorAttributePointer);
 				verticesTransformUniformPointer = gl.getUniformLocation(shadersProgram, "uVerticesTransform");
 			}
-			// === [STEP 1] ===
+
 			function initBuffers() {
 				var cubePositions = new Float32Array ([
 					// Back
@@ -191,14 +192,58 @@
 				
 				gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 				gl.vertexAttribPointer(vertexColorAttributePointer, colorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-				// === [STEP 2] === 
-				glMatrix.mat4.lookAt(viewMatrix, [9,9,9], [0,0,0], [0,0,1]);
-				glMatrix.mat4.perspective(perspectiveMatrix, 80 * Math.PI / 180, 1, 0.01, 1000);
+
+				if (!isRedraw) {
+					glMatrix.mat4.lookAt(viewMatrix, [9,9,9], [0,0,0], [0,0,1]);
+					glMatrix.mat4.perspective(perspectiveMatrix, 80 * Math.PI / 180, 1, 0.01, 1000);
+				}
 				glMatrix.mat4.multiply(pvMatrix, perspectiveMatrix, viewMatrix);
 
 				perspectiveViewUniformPointer = gl.getUniformLocation(shadersProgram, "uPerspectiveViewMatrix");
 				gl.uniformMatrix4fv(perspectiveViewUniformPointer, false, pvMatrix);
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+			}
+
+			function redrawScene() {
+				var viewAngle;
+				var viewDistance;
+				var cameraPosition;
+
+				viewAngle = parseFloat(document.getElementById("viewAngleTxt").value);
+				viewDistance = parseFloat(document.getElementById("viewDistanceTxt").value);
+				cameraPosition = document.querySelector('input[name="cameraPosition"]:checked').value;
+
+				switch (cameraPosition) {
+					case 'LFT': // Left-Front-Top
+						cameraPositionCoordinates = [-viewDistance, viewDistance, viewDistance];
+						break;
+					case 'LFB': // Left-Front-Bottom
+						cameraPositionCoordinates = [-viewDistance, viewDistance, -viewDistance];
+						break;
+					case 'LBT': // Left-Back-Top
+						cameraPositionCoordinates = [-viewDistance, -viewDistance, viewDistance];
+						break;
+					case 'LBB': // Left-Back-Bottom
+						cameraPositionCoordinates = [-viewDistance, -viewDistance, -viewDistance];
+						break; 
+					case 'RFT': // Right-Front-Top
+						cameraPositionCoordinates = [viewDistance, viewDistance, viewDistance];
+						break;
+					case 'RFB': // Right-Front-Bottom
+						cameraPositionCoordinates = [viewDistance, viewDistance, -viewDistance];
+						break;
+					case 'RBT': // Right-Back-Top
+						cameraPositionCoordinates = [viewDistance, -viewDistance, viewDistance];
+						break;
+					case 'RBB': // Right-Back-Bottom
+						cameraPositionCoordinates = [viewDistance, -viewDistance, -viewDistance];
+						break;
+				}
+
+				glMatrix.mat4.lookAt(viewMatrix, cameraPositionCoordinates, [0,0,0], [0,0,1]);
+				glMatrix.mat4.perspective(perspectiveMatrix, viewAngle * Math.PI / 180, 1, 0.01, viewAngle * 100);
+				isRedraw = true;
+				drawScene();
 			}
 
 			function main() {
@@ -241,6 +286,9 @@
 			<label for="RBT">Right-Back-Top</label>
 			<input type="radio" id="RBB" name="cameraPosition" value="RBB">
 			<label for="RBB">Right-Back-Bottom</label>
+		</p>
+		<p>
+			<button id="drawSceneButton" onclick="redrawScene()">Επανασχεδίασε</button>
 		</p>
 	</body>
 </html>
