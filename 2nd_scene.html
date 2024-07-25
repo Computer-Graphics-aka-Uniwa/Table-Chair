@@ -395,7 +395,7 @@
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
 				// ΝΕΟ 2.4 Σχεδιασμός του πίσω ποδιού του τραπεζιού
-				glMatrix.mat4.fromTranslation(translationMatrix, [9.5, 9.5, 0]);
+				glMatrix.mat4.fromTranslation(translationMatrix, [9.5, -9.5, 0]);
 				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
 				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
