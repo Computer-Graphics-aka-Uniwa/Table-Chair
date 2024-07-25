@@ -9,9 +9,11 @@
 			attribute vec4 aVertexPosition;
 			attribute vec4 aVertexColor;
 			uniform mat4 uPerspectiveViewMatrix;
+			uniform mat4 uVerticesTransform;
 			varying vec4 vColor;
 			void main() {
-				gl_Position = uPerspectiveViewMatrix * aVertexPosition;
+				// ΝΕΟ 4. Πολλαπλασιασμός του view matrix με τον vertex position
+				gl_Position = uPerspectiveViewMatrix * uVerticesTransform * aVertexPosition;
 				vColor = aVertexColor;
 			}
 		</script>
@@ -40,6 +42,11 @@
 			var yellowColorBuffer;
 			var pinkColorBuffer;
 			
+			// ΝΕΟ 2. Προσ΄θήκη των scaling, translation matrix με πολλαπλασιασμό τους στον final
+			var scalingMatrix = new Float32Array(16);
+			var translationMatrix = new Float32Array(16);
+			var finalMatrix = new Float32Array(16);
+
 			var indexBuffer;
 			var totalAngle = 0.0;
 			var requestID = 0;
@@ -48,6 +55,8 @@
 			var perspectiveMatrix = new Float32Array(16);
 			var pvMatrix = new Float32Array(16);
 			var perspectiveViewUniformPointer;
+			// ΝΕΟ 3. Προσθήκη του view uniform pointer
+			var viewUniformPointer;
 
 			function createGLContext(inCanvas) {
 				var outContext = null;
@@ -348,9 +357,6 @@
 				gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 				gl.vertexAttribPointer(vertexPositionAttributePointer, vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				
-				gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-				gl.vertexAttribPointer(vertexColorAttributePointer, colorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-				
 				// Σε περίπτωση που ο χρήστης δεν πατάει το κουμπί "Επανασχεδίασε" βάλε τις default τιμές
 				if (!isRedraw) {
 					glMatrix.mat4.lookAt(viewMatrix, [9,9,9], [0,0,0], [0,0,1]);
@@ -359,7 +365,51 @@
 				glMatrix.mat4.multiply(pvMatrix, perspectiveMatrix, viewMatrix);
 
 				perspectiveViewUniformPointer = gl.getUniformLocation(shadersProgram, "uPerspectiveViewMatrix");
-				gl.uniformMatrix4fv(perspectiveViewUniformPointer, false, pvMatrix);
+				gl.uniformMatrix4fv(perspectiveViewUniformPointer, false, pvMatrix);;
+
+				// ΝΕΟ 2.1 Σχεδιασμός του μπροστινού ποδιού του τραπεζιού
+				glMatrix.mat4.fromTranslation(translationMatrix, [9.5, 9.5, 0]);
+				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
+				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
+				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
+				gl.bindBuffer(gl.ARRAY_BUFFER, redColorBuffer);
+				gl.vertexAttribPointer(vertexColorAttributePointer, redColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+				// ΝΕΟ 2.2 Σχεδιασμός του αριστερού ποδιού του τραπεζιού
+				glMatrix.mat4.fromTranslation(translationMatrix, [-9.5, 9.5, 0]);
+				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
+				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
+				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
+				gl.bindBuffer(gl.ARRAY_BUFFER, greenColorBuffer);
+				gl.vertexAttribPointer(vertexColorAttributePointer, greenColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+				// ΝΕΟ 2.3 Σχεδιασμός του δεξιού ποδιού του τραπεζιού
+				glMatrix.mat4.fromTranslation(translationMatrix, [-9.5, -9.5, 0]);
+				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
+				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
+				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
+				gl.bindBuffer(gl.ARRAY_BUFFER, blueColorBuffer);
+				gl.vertexAttribPointer(vertexColorAttributePointer, blueColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+				// ΝΕΟ 2.4 Σχεδιασμός του πίσω ποδιού του τραπεζιού
+				glMatrix.mat4.fromTranslation(translationMatrix, [0, 0, 7.5]);
+				glMatrix.mat4.fromScaling(scalingMatrix, [1, 10, 0.5]);
+				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
+				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
+				gl.bindBuffer(gl.ARRAY_BUFFER, yellowColorBuffer);
+				gl.vertexAttribPointer(vertexColorAttributePointer, yellowColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+				// ΝΕΟ 2.5 Σχεδιασμός της επιφάνειας του τραπεζιού
+				glMatrix.mat4.fromTranslation(translationMatrix, [0, 0, 15]);
+				glMatrix.mat4.fromScaling(scalingMatrix, [20, 20, 1]);
+				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
+				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
+				gl.bindBuffer(gl.ARRAY_BUFFER, pinkColorBuffer);
+				gl.vertexAttribPointer(vertexColorAttributePointer, pinkColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 			}
 
@@ -396,6 +446,9 @@
 						break;
 					case 'RBB': // Right-Back-Bottom
 						cameraPositionCoordinates = [viewDistance, -viewDistance, -viewDistance];
+						break;
+					default:
+						cameraPositionCoordinates = [9, 9, 9];
 						break;
 				}
 				
