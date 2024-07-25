@@ -105,35 +105,35 @@
 			function initBuffers() {
 				var cubePositions = new Float32Array ([
 					// Back
-					-0.4, -0.4, 0.4, 1.0,
-        			0.4, -0.4, 0.4, 1.0,
-        			0.4, 0.4, 0.4, 1.0,
-        			-0.4, 0.4, 0.4, 1.0,
+					-1.0, -1.0, 1.0, 1.0,
+        			1.0, -1.0, 1.0, 1.0,
+        			1.0, 1.0, 1.0, 1.0,
+        			-1.0, 1.0, 1.0, 1.0,
 					// Right
-					0.4, -0.4, -0.4, 1.0,
-					0.4, -0.4, 0.4, 1.0,
-					0.4, 0.4, 0.4, 1.0,
-					0.4, 0.4, -0.4, 1.0,
+					1.0, -1.0, -1.0, 1.0,
+					1.0, -1.0, 1.0, 1.0,
+					1.0, 1.0, 1.0, 1.0,
+					1.0, 1.0, -1.0, 1.0,
 					// Front
-					0.4, -0.4, -0.4, 1.0,
-					-0.4, -0.4, -0.4, 1.0,
-					-0.4, 0.4, -0.4, 1.0,
-					0.4,  0.4, -0.4, 1.0,
+					1.0, -1.0, -1.0, 1.0,
+					-1.0, -1.0, -1.0, 1.0,
+					-1.0, 1.0, -1.0, 1.0,
+					1.0,  1.0, -1.0, 1.0,
 					// Left
-					-0.4, -0.4, -0.4, 1.0,
-					-0.4, -0.4, 0.4, 1.0,
-					-0.4, 0.4, 0.4, 1.0,
-					-0.4, 0.4, -0.4, 1.0,
+					-1.0, -1.0, -1.0, 1.0,
+					-1.0, -1.0, 1.0, 1.0,
+					-1.0, 1.0, 1.0, 1.0,
+					-1.0, 1.0, -1.0, 1.0,
 					// Bottom
-					-0.4, -0.4, 0.4, 1.0,
-					0.4, -0.4, 0.4, 1.0,
-					0.4, -0.4, -0.4, 1.0,
-					-0.4, -0.4, -0.4, 1.0,
+					-1.0, -1.0, 1.0, 1.0,
+					1.0, -1.0, 1.0, 1.0,
+					1.0, -1.0, -1.0, 1.0,
+					-1.0, -1.0, -1.0, 1.0,
 					// Top
-					-0.4, 0.4, 0.4, 1.0,
-					0.4, 0.4, 0.4, 1.0,
-					0.4, 0.4, -0.4, 1.0,
-					-0.4,  0.4, -0.4, 1.0
+					-1.0, 1.0, 1.0, 1.0,
+					1.0, 1.0, 1.0, 1.0,
+					1.0, 1.0, -1.0, 1.0,
+					-1.0,  1.0, -1.0, 1.0
     			]);
 
 				vertexBuffer = gl.createBuffer();
@@ -395,8 +395,8 @@
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
 				// ΝΕΟ 2.4 Σχεδιασμός του πίσω ποδιού του τραπεζιού
-				glMatrix.mat4.fromTranslation(translationMatrix, [0, 0, 7.5]);
-				glMatrix.mat4.fromScaling(scalingMatrix, [1, 10, 0.5]);
+				glMatrix.mat4.fromTranslation(translationMatrix, [9.5, 9.5, 0]);
+				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
 				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
 				gl.bindBuffer(gl.ARRAY_BUFFER, yellowColorBuffer);
@@ -404,8 +404,8 @@
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
 				// ΝΕΟ 2.5 Σχεδιασμός της επιφάνειας του τραπεζιού
-				glMatrix.mat4.fromTranslation(translationMatrix, [0, 0, 15]);
-				glMatrix.mat4.fromScaling(scalingMatrix, [20, 20, 1]);
+				glMatrix.mat4.fromTranslation(translationMatrix, [0, 0, 7.5]);
+				glMatrix.mat4.fromScaling(scalingMatrix, [10, 10, 0.5]);
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
 				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
 				gl.bindBuffer(gl.ARRAY_BUFFER, pinkColorBuffer);
@@ -483,7 +483,7 @@
 		</p>
 		<p>
 			Θέση κάμερας: 
-			<input type="radio" id="LFT" name="cameraPosition" value="LFT">
+			<input type="radio" id="LFT" name="cameraPosition" value="LFT" checked>
 			<label for="LFT">Left-Front-Top</label>
 			<input type="radio" id="LFB" name="cameraPosition" value="LFB">
 			<label for="LFB">Left-Front-Bottom</label>
