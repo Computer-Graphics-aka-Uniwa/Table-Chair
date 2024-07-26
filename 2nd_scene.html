@@ -367,49 +367,46 @@
 				perspectiveViewUniformPointer = gl.getUniformLocation(shadersProgram, "uPerspectiveViewMatrix");
 				gl.uniformMatrix4fv(perspectiveViewUniformPointer, false, pvMatrix);;
 
+				// Σχεδιασμός Τραπεζιού
 				// ΝΕΟ 2.1 Σχεδιασμός του κόκκινου ποδιού του τραπεζιού
-				glMatrix.mat4.fromTranslation(translationMatrix, [9.5, 9.5, 0]);
-				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
-				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
-				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
-				gl.bindBuffer(gl.ARRAY_BUFFER, redColorBuffer);
-				gl.vertexAttribPointer(vertexColorAttributePointer, redColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+				drawTableChair([9.5, 9.5, 0], [0.5, 0.5, 7.5], redColorBuffer);
 
 				// ΝΕΟ 2.2 Σχεδιασμός του πράσινου ποδιού του τραπεζιού
-				glMatrix.mat4.fromTranslation(translationMatrix, [-9.5, 9.5, 0]);
-				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
-				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
-				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
-				gl.bindBuffer(gl.ARRAY_BUFFER, greenColorBuffer);
-				gl.vertexAttribPointer(vertexColorAttributePointer, greenColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+				drawTableChair([-9.5, 9.5, 0], [0.5, 0.5, 7.5], greenColorBuffer);
 
 				// ΝΕΟ 2.3 Σχεδιασμός του μπλε ποδιού του τραπεζιού
-				glMatrix.mat4.fromTranslation(translationMatrix, [-9.5, -9.5, 0]);
-				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
-				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
-				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
-				gl.bindBuffer(gl.ARRAY_BUFFER, blueColorBuffer);
-				gl.vertexAttribPointer(vertexColorAttributePointer, blueColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+				drawTableChair([-9.5, -9.5, 0], [0.5, 0.5, 7.5], blueColorBuffer);
 
 				// ΝΕΟ 2.4 Σχεδιασμός του κίτρινου ποδιού του τραπεζιού
-				glMatrix.mat4.fromTranslation(translationMatrix, [9.5, -9.5, 0]);
-				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
-				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
-				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
-				gl.bindBuffer(gl.ARRAY_BUFFER, yellowColorBuffer);
-				gl.vertexAttribPointer(vertexColorAttributePointer, yellowColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+				drawTableChair([9.5, -9.5, 0], [0.5, 0.5, 7.5], yellowColorBuffer);
 
 				// ΝΕΟ 2.5 Σχεδιασμός της ροζ επιφάνειας του τραπεζιού
-				glMatrix.mat4.fromTranslation(translationMatrix, [0, 0, 8]);
-				glMatrix.mat4.fromScaling(scalingMatrix, [10, 10, 0.5]);
+				drawTableChair([0, 0, 8], [10, 10, 0.5], pinkColorBuffer);
+
+				// Σχεδιασμός Καρέκλας
+				// ΝΕΟ 2.6 Σχεδιασμός του πρώτου πράσινου ποδιού της καρέκλας
+				drawTableChair([-9.5, 9.5, 0], [0.25, 0.25, 3.75], greenColorBuffer);
+
+				// ΝΕΟ 2.7 Σχεδιασμός του δεύτερου πράσινου ποδιού της καρέκλας
+				drawTableChair([-9.5, 9.5, 0], [0.25, 0.25, 3.75], greenColorBuffer);
+
+				// ΝΕΟ 2.8 Σχεδιασμός του τρίτου πράσινου ποδιού του τραπεζιού
+				drawTableChair([-9.5, 9.5, 0], [0.25, 0.25, 3.75], greenColorBuffer);
+
+				// ΝΕΟ 2.9 Σχεδιασμός του τέταρτου πράσινου ποδιού του τραπεζιού
+				drawTableChair([-9.5, 9.5, 0], [0.25, 0.25, 3.75], greenColorBuffer);
+
+				// ΝΕΟ 2.10 Σχεδιασμός της πράσινης επιφάνειας της καρέκλας
+				drawTableChair([-9.5, 9.5, 0], [5, 5, 0.25], greenColorBuffer);
+			}
+
+			function drawTableChair(localTranslationMatrix, localScalingMatrix, localColorBuffer) {
+				glMatrix.mat4.fromTranslation(translationMatrix, localTranslationMatrix);
+				glMatrix.mat4.fromScaling(scalingMatrix, localScalingMatrix);
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
 				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
-				gl.bindBuffer(gl.ARRAY_BUFFER, pinkColorBuffer);
-				gl.vertexAttribPointer(vertexColorAttributePointer, pinkColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+				gl.bindBuffer(gl.ARRAY_BUFFER, localColorBuffer);
+				gl.vertexAttribPointer(vertexColorAttributePointer, localColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 			}
 
