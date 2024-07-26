@@ -57,6 +57,7 @@
 			var perspectiveViewUniformPointer;
 			// ΝΕΟ 3. Προσθήκη του view uniform pointer
 			var viewUniformPointer;
+			var cameraPositionCoordinates = [0,0,0];
 
 			function createGLContext(inCanvas) {
 				var outContext = null;
@@ -385,22 +386,22 @@
 
 				// Σχεδιασμός Καρέκλας
 				// ΝΕΟ 2.6 Σχεδιασμός του πρώτου πράσινου ποδιού της καρέκλας
-				drawTableChair([-5.25, 8.5, -3], [0.25, 0.25, 3.75], greenColorBuffer);
+				drawTableChair([-5.25, 4, -3], [0.25, 0.25, 3.75], greenColorBuffer);
 
 				// ΝΕΟ 2.7 Σχεδιασμός του δεύτερου πράσινου ποδιού της καρέκλας
-				drawTableChair([-14.75, 8.5, -3], [0.25, 0.25, 3.75], greenColorBuffer);
+				drawTableChair([-14.75, 4, -3], [0.25, 0.25, 3.75], greenColorBuffer);
 
 				// ΝΕΟ 2.8 Σχεδιασμός του τρίτου πράσινου ποδιού της καρέκλας
-				drawTableChair([-14.75, -1, -3], [0.25, 0.25, 3.75], greenColorBuffer);
+				drawTableChair([-14.75, -5.5, -3], [0.25, 0.25, 3.75], greenColorBuffer);
 
 				// ΝΕΟ 2.9 Σχεδιασμός του τέταρτου πράσινου ποδιού της καρέκλας
-				drawTableChair([-5.25, -1, -3], [0.25, 0.25, 3.75], greenColorBuffer);
+				drawTableChair([-5.25, -5.5, -3], [0.25, 0.25, 3.75], greenColorBuffer);
 
 				// ΝΕΟ 2.10 Σχεδιασμός της πράσινης επιφάνειας της καρέκλας
-				drawTableChair([-10, 3.75, 1], [5, 5, 0.25], greenColorBuffer);
+				drawTableChair([-10, -0.75, 1], [5, 5, 0.25], greenColorBuffer);
 
 				// ΝΕΟ 2.11 Σχεδιασμός της κόκκινης πλάτης της καρέκλας
-				drawTableChair([-14.75, 3.75, 5], [0.25, 5, 3.75], redColorBuffer);
+				drawTableChair([-14.75, -0.75, 5], [0.25, 5, 3.75], redColorBuffer);
 			}
 
 			function drawTableChair(localTranslationMatrix, localScalingMatrix, localColorBuffer) {
