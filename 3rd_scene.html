@@ -7,21 +7,28 @@
 
 		<script id="vShader" type="x-shader/x-vertex">
 			attribute vec4 aVertexPosition;
-			attribute vec4 aVertexColor;
+			// ΝΕΟ 4. Προσθήκη του attribute για τα texture coordinates
+			attribute vec2 aTextureCoord;
 			uniform mat4 uPerspectiveViewMatrix;
 			uniform mat4 uVerticesTransform;
-			varying vec4 vColor;
+			// ΝΕΟ 5. Προσθήκη του varying για τα texture coordinates
+			varying vec2 vTextureCoord;
 			void main() {
 				gl_Position = uPerspectiveViewMatrix * uVerticesTransform * aVertexPosition;
-				vColor = aVertexColor;
+				// ΝΕΟ 6. Αντιγραφή των texture coordinates στο varying
+				vTextureCoord = aTextureCoord;
 			}
 		</script>
 
 		<script id="fShader" type="x-shader/x-vertex">
 			precision mediump float;
-			varying vec4 vColor;
+			// ΝΕΟ 7. Προσθήκη του varying για τα texture coordinates
+			varying vec2 vTextureCoord;
+			// ΝΕΟ 8. Προσθήκη του sampler για την εικόνα
+			uniform sampler2D uSampler;
 			void main() {
-				gl_FragColor = vColor;
+				// ΝΕΟ 9. Χρήση των texture coordinates για την ανάγνωση της εικόνας
+				gl_FragColor = texture2D(uSampler, vTextureCoord);
 			}
 		</script>
 
@@ -33,11 +40,6 @@
 			var vertexColorAttributePointer;
 			var verticesTransformUniformPointer;
 			var vertexBuffer;
-			var redColorBuffer;
-			var greenColorBuffer;
-			var blueColorBuffer; 
-			var yellowColorBuffer;
-			var pinkColorBuffer;
 			var scalingMatrix = new Float32Array(16);
 			var translationMatrix = new Float32Array(16);
 			var finalMatrix = new Float32Array(16);
@@ -51,6 +53,10 @@
 			var perspectiveViewUniformPointer;
 			var viewUniformPointer;
 			var cameraPositionCoordinates = [0,0,0];
+			// ΝΕΟ 10. Δήλωση των buffers για τα textures
+			var textureCoordAttributePointer;
+			// ΝΕΟ 11. Δήλωση του sampler pointer για την θέση του uniform στον fragment shader
+			var uSamplerUniformPointer;
 
 			function createGLContext(inCanvas) {
 				var outContext = null;
@@ -135,191 +141,6 @@
 				gl.bufferData(gl.ARRAY_BUFFER, cubePositions, gl.STATIC_DRAW);
 				vertexBuffer.itemSize = 4;
 				vertexBuffer.numItems = 24;
-
-				var redColors = new Float32Array ([
-					// Back
-					0.3, 0.0, 0.0, 1.0,
-					0.3, 0.0, 0.0, 1.0,
-					0.3, 0.0, 0.0, 1.0,
-					0.3, 0.0, 0.0, 1.0,
-					// Right
-					0.1, 0.0, 0.0, 1.0,
-					0.1, 0.0, 0.0, 1.0,
-					0.1, 0.0, 0.0, 1.0,
-					0.1, 0.0, 0.0, 1.0,
-					// Front
-					0.6, 0.0, 0.0, 1.0,
-					0.6, 0.0, 0.0, 1.0,
-					0.6, 0.0, 0.0, 1.0,
-					0.6, 0.0, 0.0, 1.0,
-					// Left
-					1.0, 0.0, 0.0, 1.0,
-					1.0, 0.0, 0.0, 1.0,
-					1.0, 0.0, 0.0, 1.0,
-					1.0, 0.0, 0.0, 1.0,
-					// Bottom
-					0.8, 0.0, 0.0, 1.0,
-					0.8, 0.0, 0.0, 1.0,
-					0.8, 0.0, 0.0, 1.0,
-					0.8, 0.0, 0.0, 1.0,
-					// Top
-					0.5, 0.0, 0.0, 1.0,
-					0.5, 0.0, 0.0, 1.0,
-					0.5, 0.0, 0.0, 1.0,
-					0.5, 0.0, 0.0, 1.0
-				]);
-
-				redColorBuffer = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, redColorBuffer);
-				gl.bufferData(gl.ARRAY_BUFFER, redColors, gl.STATIC_DRAW);
-				redColorBuffer.itemSize = 4;
-				redColorBuffer.numItems = 24;
-
-				var greenColors = new Float32Array ([
-					// Back
-					0.0, 0.3, 0.0, 1.0,
-					0.0, 0.3, 0.0, 1.0,
-					0.0, 0.3, 0.0, 1.0,
-					0.0, 0.3, 0.0, 1.0,
-					// Right
-					0.0, 0.1, 0.0, 1.0,
-					0.0, 0.1, 0.0, 1.0,
-					0.0, 0.1, 0.0, 1.0,
-					0.0, 0.1, 0.0, 1.0,
-					// Front
-					0.0, 0.6, 0.0, 1.0,
-					0.0, 0.6, 0.0, 1.0,
-					0.0, 0.6, 0.0, 1.0,
-					0.0, 0.6, 0.0, 1.0,
-					// Left
-					0.0, 1.0, 0.0, 1.0,
-					0.0, 1.0, 0.0, 1.0,
-					0.0, 1.0, 0.0, 1.0,
-					0.0, 1.0, 0.0, 1.0,
-					// Bottom
-					0.0, 0.8, 0.0, 1.0,
-					0.0, 0.8, 0.0, 1.0,
-					0.0, 0.8, 0.0, 1.0,
-					0.0, 0.8, 0.0, 1.0,
-					// Top
-					0.0, 0.5, 0.0, 1.0,
-					0.0, 0.5, 0.0, 1.0,
-					0.0, 0.5, 0.0, 1.0,
-					0.0, 0.5, 0.0, 1.0
-				]);
-
-				greenColorBuffer = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, greenColorBuffer);
-				gl.bufferData(gl.ARRAY_BUFFER, greenColors, gl.STATIC_DRAW);
-				greenColorBuffer.itemSize = 4;
-				greenColorBuffer.numItems = 24;
-				
-				var blueColors = new Float32Array ([
-					// Back
-					0.0, 0.0, 0.3, 1.0,
-					0.0, 0.0, 0.3, 1.0,
-					0.0, 0.0, 0.3, 1.0,
-					0.0, 0.0, 0.3, 1.0,
-					// Right
-					0.0, 0.0, 0.1, 1.0,
-					0.0, 0.0, 0.1, 1.0,
-					0.0, 0.0, 0.1, 1.0,
-					0.0, 0.0, 0.1, 1.0,
-					// Front
-					0.0, 0.0, 0.6, 1.0,
-					0.0, 0.0, 0.6, 1.0,
-					0.0, 0.0, 0.6, 1.0,
-					0.0, 0.0, 0.6, 1.0,
-					// Left
-					0.0, 0.0, 1.0, 1.0,
-					0.0, 0.0, 1.0, 1.0,
-					0.0, 0.0, 1.0, 1.0,
-					0.0, 0.0, 1.0, 1.0,
-					// Bottom
-					0.0, 0.0, 0.8, 1.0,
-					0.0, 0.0, 0.8, 1.0,
-					0.0, 0.0, 0.8, 1.0,
-					0.0, 0.0, 0.8, 1.0,
-					// Top
-					0.0, 0.0, 0.5, 1.0,
-					0.0, 0.0, 0.5, 1.0,
-					0.0, 0.0, 0.5, 1.0,
-					0.0, 0.0, 0.5, 1.0
-				]);
-
-				blueColorBuffer = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, blueColorBuffer);
-				gl.bufferData(gl.ARRAY_BUFFER, blueColors, gl.STATIC_DRAW);
-				blueColorBuffer.itemSize = 4;
-				blueColorBuffer.numItems = 24;
-
-				var yellowColors = new Float32Array([
-					// Back
-					1.0, 1.0, 0.0, 1.0,
-					1.0, 1.0, 0.0, 1.0,
-					1.0, 1.0, 0.0, 1.0,
-					1.0, 1.0, 0.0, 1.0,
-					// Front
-					0.8, 0.8, 0.0, 1.0,
-					0.8, 0.8, 0.0, 1.0,
-					0.8, 0.8, 0.0, 1.0,
-					0.8, 0.8, 0.0, 1.0,
-					// Left
-					0.6, 0.6, 0.0, 1.0,
-					0.6, 0.6, 0.0, 1.0,
-					0.6, 0.6, 0.0, 1.0,
-					0.6, 0.6, 0.0, 1.0,
-					// Bottom
-					0.4, 0.4, 0.0, 1.0,
-					0.4, 0.4, 0.0, 1.0,
-					0.4, 0.4, 0.0, 1.0,
-					0.4, 0.4, 0.0, 1.0,
-					// Top
-					0.2, 0.2, 0.0, 1.0,
-					0.2, 0.2, 0.0, 1.0,
-					0.2, 0.2, 0.0, 1.0,
-					0.2, 0.2, 0.0, 1.0
-				]);
-
-				yellowColorBuffer = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, yellowColorBuffer);
-				gl.bufferData(gl.ARRAY_BUFFER, yellowColors, gl.STATIC_DRAW);
-				yellowColorBuffer.itemSize = 4;
-				yellowColorBuffer.numItems = 24;
-
-				var pinkColors = new Float32Array([
-					// Back
-					1.0, 0.75, 0.8, 1.0,
-					1.0, 0.75, 0.8, 1.0,
-					1.0, 0.75, 0.8, 1.0,
-					1.0, 0.75, 0.8, 1.0,
-					// Front
-					1.0, 0.5, 0.6, 1.0,
-					1.0, 0.5, 0.6, 1.0,
-					1.0, 0.5, 0.6, 1.0,
-					1.0, 0.5, 0.6, 1.0,
-					// Left
-					1.0, 0.25, 0.4, 1.0,
-					1.0, 0.25, 0.4, 1.0,
-					1.0, 0.25, 0.4, 1.0,
-					1.0, 0.25, 0.4, 1.0,
-					// Bottom
-					1.0, 0.1, 0.3, 1.0,
-					1.0, 0.1, 0.3, 1.0,
-					1.0, 0.1, 0.3, 1.0,
-					1.0, 0.1, 0.3, 1.0,
-					// Top
-					1.0, 0.0, 0.2, 1.0,
-					1.0, 0.0, 0.2, 1.0,
-					1.0, 0.0, 0.2, 1.0,
-					1.0, 0.0, 0.2, 1.0
-				]);
-
-				pinkColorBuffer = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, pinkColorBuffer);
-				gl.bufferData(gl.ARRAY_BUFFER, pinkColors, gl.STATIC_DRAW);
-				pinkColorBuffer.itemSize = 4;
-				pinkColorBuffer.numItems = 24;
 
 				indexBuffer = gl.createBuffer();
 				var indexMatrix = new Uint16Array ([
