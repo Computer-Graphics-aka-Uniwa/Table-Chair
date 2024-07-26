@@ -367,7 +367,7 @@
 				perspectiveViewUniformPointer = gl.getUniformLocation(shadersProgram, "uPerspectiveViewMatrix");
 				gl.uniformMatrix4fv(perspectiveViewUniformPointer, false, pvMatrix);;
 
-				// ΝΕΟ 2.1 Σχεδιασμός του μπροστινού ποδιού του τραπεζιού
+				// ΝΕΟ 2.1 Σχεδιασμός του κόκκινου ποδιού του τραπεζιού
 				glMatrix.mat4.fromTranslation(translationMatrix, [9.5, 9.5, 0]);
 				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
@@ -376,7 +376,7 @@
 				gl.vertexAttribPointer(vertexColorAttributePointer, redColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
-				// ΝΕΟ 2.2 Σχεδιασμός του αριστερού ποδιού του τραπεζιού
+				// ΝΕΟ 2.2 Σχεδιασμός του πράσινου ποδιού του τραπεζιού
 				glMatrix.mat4.fromTranslation(translationMatrix, [-9.5, 9.5, 0]);
 				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
@@ -385,7 +385,7 @@
 				gl.vertexAttribPointer(vertexColorAttributePointer, greenColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
-				// ΝΕΟ 2.3 Σχεδιασμός του δεξιού ποδιού του τραπεζιού
+				// ΝΕΟ 2.3 Σχεδιασμός του μπλε ποδιού του τραπεζιού
 				glMatrix.mat4.fromTranslation(translationMatrix, [-9.5, -9.5, 0]);
 				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
@@ -394,7 +394,7 @@
 				gl.vertexAttribPointer(vertexColorAttributePointer, blueColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
-				// ΝΕΟ 2.4 Σχεδιασμός του πίσω ποδιού του τραπεζιού
+				// ΝΕΟ 2.4 Σχεδιασμός του κίτρινου ποδιού του τραπεζιού
 				glMatrix.mat4.fromTranslation(translationMatrix, [9.5, -9.5, 0]);
 				glMatrix.mat4.fromScaling(scalingMatrix, [0.5, 0.5, 7.5]);
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
@@ -403,8 +403,8 @@
 				gl.vertexAttribPointer(vertexColorAttributePointer, yellowColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
-				// ΝΕΟ 2.5 Σχεδιασμός της επιφάνειας του τραπεζιού
-				glMatrix.mat4.fromTranslation(translationMatrix, [0, 0, 7.5]);
+				// ΝΕΟ 2.5 Σχεδιασμός της ροζ επιφάνειας του τραπεζιού
+				glMatrix.mat4.fromTranslation(translationMatrix, [0, 0, 8]);
 				glMatrix.mat4.fromScaling(scalingMatrix, [10, 10, 0.5]);
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
 				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
