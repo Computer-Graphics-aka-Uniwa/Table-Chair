@@ -385,19 +385,20 @@
 
 				// Σχεδιασμός Καρέκλας
 				// ΝΕΟ 2.6 Σχεδιασμός του πρώτου πράσινου ποδιού της καρέκλας
-				drawTableChair([-9.5, 9.5, 0], [0.25, 0.25, 3.75], greenColorBuffer);
+				drawTableChair([-5, 7.5, 0], [0.25, 0.25, 3.75], greenColorBuffer);
 
 				// ΝΕΟ 2.7 Σχεδιασμός του δεύτερου πράσινου ποδιού της καρέκλας
-				drawTableChair([-9.5, 9.5, 0], [0.25, 0.25, 3.75], greenColorBuffer);
+				drawTableChair([-15, 7.5, 0], [0.25, 0.25, 3.75], greenColorBuffer);
 
-				// ΝΕΟ 2.8 Σχεδιασμός του τρίτου πράσινου ποδιού του τραπεζιού
-				drawTableChair([-9.5, 9.5, 0], [0.25, 0.25, 3.75], greenColorBuffer);
+				// ΝΕΟ 2.8 Σχεδιασμός του τρίτου πράσινου ποδιού της καρέκλας
+				drawTableChair([-5, -1.5, 0], [0.25, 0.25, 3.75], greenColorBuffer);
 
-				// ΝΕΟ 2.9 Σχεδιασμός του τέταρτου πράσινου ποδιού του τραπεζιού
-				drawTableChair([-9.5, 9.5, 0], [0.25, 0.25, 3.75], greenColorBuffer);
+				// ΝΕΟ 2.9 Σχεδιασμός του τέταρτου πράσινου ποδιού της καρέκλας
+				drawTableChair([-15, -1.5, 0], [0.25, 0.25, 3.75], greenColorBuffer);
 
 				// ΝΕΟ 2.10 Σχεδιασμός της πράσινης επιφάνειας της καρέκλας
-				drawTableChair([-9.5, 9.5, 0], [5, 5, 0.25], greenColorBuffer);
+				drawTableChair([-10.5, 3, 4.5], [5, 5, 0.25], greenColorBuffer);
+
 			}
 
 			function drawTableChair(localTranslationMatrix, localScalingMatrix, localColorBuffer) {
@@ -475,8 +476,8 @@
 	<body onload="main()">
 		<canvas id="sceneCanvas"></canvas>
 		<p>
-			Γωνία θέασης (σε μοίρες): <input type="text" id="viewAngleTxt" value="0" autocomplete="off">
-			Ορθογώνια απόσταση της κάμερας: <input type="text" id="viewDistanceTxt" value="0" autocomplete="off">
+			Γωνία θέασης (σε μοίρες): <input type="text" id="viewAngleTxt" value="90" autocomplete="off">
+			Ορθογώνια απόσταση της κάμερας: <input type="text" id="viewDistanceTxt" value="20" autocomplete="off">
 		</p>
 		<p>
 			Θέση κάμερας: 
