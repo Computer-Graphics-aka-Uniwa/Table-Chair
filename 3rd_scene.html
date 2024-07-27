@@ -57,6 +57,12 @@
 			var textureCoordAttributePointer;
 			// ΝΕΟ 11. Δήλωση του sampler pointer για την θέση του uniform στον fragment shader
 			var uSamplerUniformPointer;
+			// ΝΕΟ 12. Δήλωση του buffer για τα texture coordinates
+			var textureBuffer;
+			// ΝΕΟ 13. Δήλωση των texture
+			var tableTexture;
+			var chairTexture;
+			
 
 			function createGLContext(inCanvas) {
 				var outContext = null;
@@ -97,9 +103,12 @@
 				gl.useProgram(shadersProgram);
 				vertexPositionAttributePointer = gl.getAttribLocation(shadersProgram, "aVertexPosition");
 				gl.enableVertexAttribArray(vertexPositionAttributePointer);
-				vertexColorAttributePointer = gl.getAttribLocation(shadersProgram, "aVertexColor");
-				gl.enableVertexAttribArray(vertexColorAttributePointer);
+				// ΝΕΟ 14. Ανάγνωση του attribute για τα texture coordinates
+				textureCoordAttributePointer = gl.getAttribLocation(shadersProgram, "aTextureCoord");
+				gl.enableVertexAttribArray(textureCoordAttributePointer);
 				verticesTransformUniformPointer = gl.getUniformLocation(shadersProgram, "uVerticesTransform");
+				// ΝΕΟ 15. Ανάγνωση του sampler για την εικόνα
+				uSamplerUniformPointer = gl.getUniformLocation(shadersProgram, "uSampler");
 			}
 
 			function initBuffers() {
@@ -157,6 +166,70 @@
 				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexMatrix, gl.STATIC_DRAW);
 				indexBuffer.itemSize = 1;
 				indexBuffer.numItems = 36;
+
+				// ΝΕΟ 16. Δημιουργία του buffer για τα texture coordinates
+				var textureCoordinates = new Float32Array([
+					// Back
+					0.0, 0.0,
+					1.0, 0.0,
+					1.0, 1.0,
+					0.0, 1.0,
+					// Right
+					0.0, 0.0,
+					1.0, 0.0,
+					1.0, 1.0,
+					0.0, 1.0,
+					// Front
+					0.0, 0.0,
+					1.0, 0.0,
+					1.0, 1.0,
+					0.0, 1.0,
+					// Left
+					0.0, 0.0,
+					1.0, 0.0,
+					1.0, 1.0,
+					0.0, 1.0,
+					// Bottom
+					0.0, 0.0,
+					1.0, 0.0,
+					1.0, 1.0,
+					0.0, 1.0,
+					// Top
+					0.0, 0.0,
+					1.0, 0.0,
+					1.0, 1.0,
+					0.0, 1.0
+				]);
+
+				textureBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
+				gl.bufferData(gl.ARRAY_BUFFER, textureCoordinates, gl.STATIC_DRAW);
+				textureBuffer.itemSize = 2;
+
+				// ΝΕΟ 17. Δημιουργία των texture
+				tableTexture = gl.createTexture();
+				var tableTextureURL = "textures/Table_Texture.jpg";
+				preprocessTextureImage(tableTextureURL, tableTexture);
+
+				chairTexture = gl.createTexture();
+				var chairTextureURL = "textures/Chair_Texture.jpg";
+				preprocessTextureImage(chairTextureURL, chairTexture);
+			}
+
+			// ΝΕΟ 17.1 Custom συνάρτηση για σύνδεση αντικειμένου texture με εικόνα και προεπεξεργασία εικόνας
+			function preprocessTextureImage(imageURL, textureObject) {
+				var imageObject = new Image();
+				
+				imageObject.onload = function() {    
+					gl.bindTexture(gl.TEXTURE_2D, textureObject);	
+					gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+					gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageObject);
+					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+					gl.generateMipmap(gl.TEXTURE_2D);
+				};
+
+				imageObject.src = imageURL;	
 			}
 
 			function drawScene() {
@@ -166,7 +239,7 @@
 				
 				gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 				gl.vertexAttribPointer(vertexPositionAttributePointer, vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
-				
+
 				// Σε περίπτωση που ο χρήστης δεν πατάει το κουμπί "Επανασχεδίασε" βάλε τις default τιμές
 				if (!isRedraw) {
 					glMatrix.mat4.lookAt(viewMatrix, [9,9,9], [0,0,0], [0,0,1]);
@@ -177,29 +250,42 @@
 				perspectiveViewUniformPointer = gl.getUniformLocation(shadersProgram, "uPerspectiveViewMatrix");
 				gl.uniformMatrix4fv(perspectiveViewUniformPointer, false, pvMatrix);;
 
+				// ΝΕΟ 18. Ανάγνωση του buffer για τα texture coordinates του τραπεζιού
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, tableTexture);
+				gl.uniform1i(uSamplerUniformPointer, 0);
+
 				// Σχεδιασμός Τραπεζιού
-				drawTableChair([9.5, 9.5, 0], [0.5, 0.5, 7.5], redColorBuffer);
-				drawTableChair([-9.5, 9.5, 0], [0.5, 0.5, 7.5], greenColorBuffer);
-				drawTableChair([-9.5, -9.5, 0], [0.5, 0.5, 7.5], blueColorBuffer);
-				drawTableChair([9.5, -9.5, 0], [0.5, 0.5, 7.5], yellowColorBuffer);
-				drawTableChair([0, 0, 8], [10, 10, 0.5], pinkColorBuffer);
+				drawTableChair([9.5, 9.5, 0], [0.5, 0.5, 7.5], textureBuffer);
+				drawTableChair([-9.5, 9.5, 0], [0.5, 0.5, 7.5], textureBuffer);
+				drawTableChair([-9.5, -9.5, 0], [0.5, 0.5, 7.5], textureBuffer);
+				drawTableChair([9.5, -9.5, 0], [0.5, 0.5, 7.5], textureBuffer);
+				drawTableChair([0, 0, 8], [10, 10, 0.5], textureBuffer);
+
+				// ΝΕΟ 19. Ανάγνωση του buffer για τα texture coordinates της καρέκλας
+				gl.activeTexture(gl.TEXTURE1);
+				gl.bindTexture(gl.TEXTURE_2D, chairTexture);
+				gl.uniform1i(uSamplerUniformPointer, 1);
 
 				// Σχεδιασμός Καρέκλας
-				drawTableChair([-5.25, 4, -3], [0.25, 0.25, 3.75], greenColorBuffer);
-				drawTableChair([-14.75, 4, -3], [0.25, 0.25, 3.75], greenColorBuffer);
-				drawTableChair([-14.75, -5.5, -3], [0.25, 0.25, 3.75], greenColorBuffer);
-				drawTableChair([-5.25, -5.5, -3], [0.25, 0.25, 3.75], greenColorBuffer);
-				drawTableChair([-10, -0.75, 1], [5, 5, 0.25], greenColorBuffer);
-				drawTableChair([-14.75, -0.75, 5], [0.25, 5, 3.75], redColorBuffer);
+				drawTableChair([-5.25, 4, -3], [0.25, 0.25, 3.75], textureBuffer);
+				drawTableChair([-14.75, 4, -3], [0.25, 0.25, 3.75], textureBuffer);
+				drawTableChair([-14.75, -5.5, -3], [0.25, 0.25, 3.75], textureBuffer);
+				drawTableChair([-5.25, -5.5, -3], [0.25, 0.25, 3.75], textureBuffer);
+				drawTableChair([-10, -0.75, 1], [5, 5, 0.25], textureBuffer);
+				drawTableChair([-14.75, -0.75, 5], [0.25, 5, 3.75], textureBuffer);
 			}
 
-			function drawTableChair(localTranslationMatrix, localScalingMatrix, localColorBuffer) {
+			function drawTableChair(localTranslationMatrix, localScalingMatrix, localTextureBuffer) {
 				glMatrix.mat4.fromTranslation(translationMatrix, localTranslationMatrix);
 				glMatrix.mat4.fromScaling(scalingMatrix, localScalingMatrix);
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
 				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
-				gl.bindBuffer(gl.ARRAY_BUFFER, localColorBuffer);
-				gl.vertexAttribPointer(vertexColorAttributePointer, localColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+				
+				gl.bindBuffer(gl.ARRAY_BUFFER, localTextureBuffer);
+				gl.vertexAttribPointer(textureCoordAttributePointer, localTextureBuffer.itemSize, gl.FLOAT, false, 0, 0);
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+				
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 			}
 
