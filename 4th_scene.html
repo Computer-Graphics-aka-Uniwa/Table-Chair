@@ -45,6 +45,7 @@
 			var finalMatrix = new Float32Array(16);
 			var indexBuffer;
 			var totalAngle = 0.0;
+			var totalZ = 0.01;
 			var requestID = 0;
 			var isRedraw = false;
 			var viewMatrix = new Float32Array(16);
@@ -68,6 +69,20 @@
 			var floorVertexBuffer;   
 			var floorIndexBuffer;
 			var floorTextureBuffer;
+
+			var numberOfFrames;
+			var previousTime;
+			var currentTime;
+
+			var mouseDown = false;
+			var deltaFresh = false;
+			var lastMouseX = null;
+			var lastMouseY = null;
+			var currMouseX = null;
+			var currMouseY = null;
+			var deltaMouseX = 0;
+			var deltaMouseY = 0;
+			var rect;
 			
 
 			function createGLContext(inCanvas) {
@@ -282,6 +297,17 @@
 
 			function drawScene() {
 				gl.useProgram(shadersProgram);
+
+				if ((mouseDown == true && deltaFresh == true) && (deltaMouseX != 0 && deltaMouseY != 0)) {
+					totalAngle += deltaMouseX * Math.PI / 180;
+					totalZ += deltaMouseY / 10;
+					var r = Math.sqrt(cameraPositionCoordinates[0] * cameraPositionCoordinates[0] + cameraPositionCoordinates[1] * cameraPositionCoordinates[1]);
+					var x = r * Math.cos(totalAngle);
+					var y = r * Math.sin(totalAngle);
+					glMatrix.mat4.lookAt(viewMatrix, [x, y, totalZ], [0,0,0], [0,0,1]);
+					glMatrix.mat4.perspective(perspectiveMatrix, 80 * Math.PI / 180, 1, 0.01, 1000);
+				}
+
 				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 				gl.enable(gl.DEPTH_TEST);
 				
@@ -431,7 +457,46 @@
 				gl.clearColor(0.3, 0.3, 0.3, 1.0);
 				gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 				gl.enable(gl.DEPTH_TEST);
+
+				canvas.onmousedown = handleMouseDown;
+				window.onmouseup = handleMouseUp;
+				canvas.onmousemove = handleMouseMove;
+				//canvas.onwheel = handleMouseWheel;
+				rect = canvas.getBoundingClientRect();
+
 				drawScene();
+			}
+
+			function handleMouseDown(event) {
+				mouseDown = true;
+				lastMouseX = event.clientX - rect.left;
+				lastMouseY = rect.bottom - event.clientY;
+				deltaMouseX = 0;
+				deltaMouseY = 0;
+				deltaFresh = true;
+			}
+
+			function handleMouseUp(event) {
+    			mouseDown = false;
+			}
+
+			function handleMouseMove(event) {
+				currMouseX = event.clientX - rect.left;
+				currMouseY = rect.bottom - event.clientY;
+
+				if (mouseDown)
+				{
+					deltaMouseX = currMouseX - lastMouseX;
+					deltaMouseY = currMouseY - lastMouseY;
+					deltaFresh = true;
+				}
+				
+				if(requestID == 0){
+					drawScene();
+				}
+
+				lastMouseX = currMouseX;
+				lastMouseY = currMouseY;
 			}
 
 			// ΝΕΟ 1. Συνάρτηση για εκκίνηση της κίνησης
