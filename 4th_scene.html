@@ -42,6 +42,7 @@
 			var vertexBuffer;
 			var scalingMatrix = new Float32Array(16);
 			var translationMatrix = new Float32Array(16);
+			var rotationYMatrix = new Float32Array(16);
 			var finalMatrix = new Float32Array(16);
 			var indexBuffer;
 			var totalAngle = 0.0;
@@ -83,6 +84,7 @@
 			var deltaMouseX = 0;
 			var deltaMouseY = 0;
 			var rect;
+			var wheelRadiusFactor = 1;
 			
 
 			function createGLContext(inCanvas) {
@@ -298,6 +300,12 @@
 			function drawScene() {
 				gl.useProgram(shadersProgram);
 
+				if (wheelRadiusFactor > 90) {
+					wheelRadiusFactor = 90;
+				} else if (wheelRadiusFactor < 0) {
+					wheelRadiusFactor = 0;
+				}
+
 				if ((mouseDown == true && deltaFresh == true) && (deltaMouseX != 0 && deltaMouseY != 0)) {
 					totalAngle += deltaMouseX * Math.PI / 180;
 					totalZ += deltaMouseY / 10;
@@ -330,11 +338,11 @@
 				gl.uniform1i(uSamplerUniformPointer, 0);
 
 				// Σχεδιασμός Τραπεζιού
-				drawComponent([9.5, 9.5, 0], [0.5, 0.5, 7.5], textureBuffer);
-				drawComponent([-9.5, 9.5, 0], [0.5, 0.5, 7.5], textureBuffer);
-				drawComponent([-9.5, -9.5, 0], [0.5, 0.5, 7.5], textureBuffer);
-				drawComponent([9.5, -9.5, 0], [0.5, 0.5, 7.5], textureBuffer);
-				drawComponent([0, 0, 8], [10, 10, 0.5], textureBuffer);
+				drawComponent([9.5, 9.5, 0], [0.5, 0.5, 7.5], textureBuffer, "table");
+				drawComponent([-9.5, 9.5, 0], [0.5, 0.5, 7.5], textureBuffer, "table");
+				drawComponent([-9.5, -9.5, 0], [0.5, 0.5, 7.5], textureBuffer, "table");
+				drawComponent([9.5, -9.5, 0], [0.5, 0.5, 7.5], textureBuffer, "table");
+				drawComponent([0, 0, 8], [10, 10, 0.5], textureBuffer, "table");
 
 				// ΝΕΟ 19. Ανάγνωση του buffer για τα texture coordinates της καρέκλας
 				gl.activeTexture(gl.TEXTURE1);
@@ -342,12 +350,12 @@
 				gl.uniform1i(uSamplerUniformPointer, 1);
 
 				// Σχεδιασμός Καρέκλας
-				drawComponent([-5.25, 4, -4], [0.25, 0.25, 3.75], textureBuffer);
-				drawComponent([-14.75, 4, -4], [0.25, 0.25, 3.75], textureBuffer);
-				drawComponent([-14.75, -5.5, -4], [0.25, 0.25, 3.75], textureBuffer);
-				drawComponent([-5.25, -5.5, -4], [0.25, 0.25, 3.75], textureBuffer);
-				drawComponent([-10, -0.75, 0], [5, 5, 0.25], textureBuffer);
-				drawComponent([-14.75, -0.75, 4], [0.25, 5, 3.75], textureBuffer);
+				drawComponent([-5.25, 4 - wheelRadiusFactor * 0.1, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "chair");
+				drawComponent([-14.75, 4 - wheelRadiusFactor * 0.1, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "chair");
+				drawComponent([-14.75, -5.5 - wheelRadiusFactor * 0.1, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "chair");
+				drawComponent([-5.25, -5.5 - wheelRadiusFactor * 0.1, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "chair");
+				drawComponent([-10, -0.75 - wheelRadiusFactor * 0.1, 0 + wheelRadiusFactor * 0.15], [5, 5, 0.25], textureBuffer, "chair");
+				drawComponent([-14.75, -0.75 - wheelRadiusFactor * 0.1, 4 + wheelRadiusFactor * 0.15], [0.25, 5, 3.75], textureBuffer, "chair");
 
 				// NEO 20. Ανάγνωση του buffer για τα texture coordinates του ουρανού
 				gl.activeTexture(gl.TEXTURE2);
@@ -355,7 +363,7 @@
 				gl.uniform1i(uSamplerUniformPointer, 2);
 
 				// Σχεδιασμός Ουρανού (skybox)
-				drawComponent([0, 0, 0], [500, 500, 500], textureBuffer);
+				drawComponent([0, 0, 0], [500, 500, 500], textureBuffer, "skybox");
 
 				// NEO 21. Ανάγνωση του buffer για τα texture coordinates του πατώματος
 				gl.activeTexture(gl.TEXTURE3);
@@ -371,13 +379,20 @@
 				
 				glMatrix.mat4.identity(finalMatrix);
 				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
+				gl.polygonOffset(-1.0,-1.0);
+				gl.enable(gl.POLYGON_OFFSET_FILL);
 				gl.drawElements(gl.TRIANGLES, floorIndexBuffer.itemCount, gl.UNSIGNED_SHORT, 0);
+				gl.disable(gl.POLYGON_OFFSET_FILL);
 			}
 
-			function drawComponent(localTranslationMatrix, localScalingMatrix, localTextureBuffer) {
+			function drawComponent(localTranslationMatrix, localScalingMatrix, localTextureBuffer, typeComponent) {
 				glMatrix.mat4.fromTranslation(translationMatrix, localTranslationMatrix);
 				glMatrix.mat4.fromScaling(scalingMatrix, localScalingMatrix);
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
+				if (typeComponent == "chair") {
+					glMatrix.mat4.fromYRotation(rotationYMatrix, -wheelRadiusFactor * Math.PI / 180);
+					glMatrix.mat4.multiply(finalMatrix,  rotationYMatrix, finalMatrix);
+				}
 				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
 				
 				gl.bindBuffer(gl.ARRAY_BUFFER, localTextureBuffer);
@@ -461,7 +476,7 @@
 				canvas.onmousedown = handleMouseDown;
 				window.onmouseup = handleMouseUp;
 				canvas.onmousemove = handleMouseMove;
-				//canvas.onwheel = handleMouseWheel;
+				canvas.onwheel = handleMouseWheel;
 				rect = canvas.getBoundingClientRect();
 
 				drawScene();
@@ -497,6 +512,17 @@
 
 				lastMouseX = currMouseX;
 				lastMouseY = currMouseY;
+			}
+
+			function handleMouseWheel(event) {
+				if (event.deltaY > 0)
+					wheelRadiusFactor = wheelRadiusFactor + 0.5;
+				else
+					wheelRadiusFactor = wheelRadiusFactor - 0.5;
+
+				if(requestID == 0){
+					drawScene();
+				}
 			}
 
 			// ΝΕΟ 1. Συνάρτηση για εκκίνηση της κίνησης
