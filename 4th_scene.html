@@ -62,6 +62,12 @@
 			// ΝΕΟ 13. Δήλωση των texture
 			var tableTexture;
 			var chairTexture;
+			var skyTexture;
+			var floorTexture;
+
+			var floorVertexBuffer = new Float32Array(16);   
+			var floorIndexBuffer = new Float32Array(16);
+			var floorTextureBuffer = new Float32Array(16);
 			
 
 			function createGLContext(inCanvas) {
@@ -151,7 +157,6 @@
 				vertexBuffer.itemSize = 4;
 				vertexBuffer.numItems = 24;
 
-				indexBuffer = gl.createBuffer();
 				var indexMatrix = new Uint16Array ([
 					0, 1, 2, 0, 2, 3,
 					4, 5, 6, 4, 6, 7,
@@ -222,6 +227,41 @@
 				floorTexture = gl.createTexture();
 				var floorTextureURL = "textures/Floor_Texture.jpg";
 				preprocessTextureImage(floorTextureURL, floorTexture);
+
+				var floorVertices = ([
+					-25.0, -25.0, -15.0, 1.0,
+					25.0, -25.0, -15.0, 1.0,
+					25.0, 25.0, -15.0, 1.0,
+					-25.0, 25.0, -15.0, 1.0
+				]);
+
+				floorVertexBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, floorVertexBuffer);
+				gl.bufferData(gl.ARRAY_BUFFER, floorVertices, gl.STATIC_DRAW);
+				floorVertexBuffer.itemSize = 4;
+				floorVertexBuffer.itemCount = 4;
+
+				var floorIndexMatrix = ([
+					0, 1, 2,
+					0, 2, 3
+				]);
+
+				floorIndexBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, floorIndexBuffer);
+				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, floorIndexMatrix, gl.STATIC_DRAW);
+				floorIndexBuffer.itemSize = 6;
+
+				var floorTextureCoords = ([
+					0.0, 0.0,
+					1.0, 0.0,
+					1.0, 1.0,
+					0.0, 1.0
+				]);
+
+				floorTextureBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, floorTextureBuffer);
+				gl.bufferData(gl.ARRAY_BUFFER, floorTextureCoords, gl.STATIC_DRAW);
+				floorTextureBuffer.itemSize = 2;
 			}
 
 			// ΝΕΟ 17.1 Custom συνάρτηση για σύνδεση αντικειμένου texture με εικόνα και προεπεξεργασία εικόνας
@@ -297,7 +337,7 @@
 				gl.uniform1i(uSamplerUniformPointer, 3);
 
 				// Σχεδιασμός Πατώματος 
-				//drawComponent([0, 0, 0], [25, 25, 0], textureBuffer);
+				drawFloor([0, 0, -50], [50, 50], floorTextureBuffer);
 			}
 
 			function drawComponent(localTranslationMatrix, localScalingMatrix, localTextureBuffer) {
@@ -311,6 +351,21 @@
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 				
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+			}
+
+			function drawFloor(floorTranslationMatrix, floorScalingMatrix, floorTextureBuffer) {
+				glMatrix.mat4.fromTranslation(translationMatrix, floorTranslationMatrix);
+				glMatrix.mat4.fromScaling(scalingMatrix, floorScalingMatrix);
+				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
+				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
+
+				gl.bindBuffer(gl.ARRAY_BUFFER, floorVertexBuffer);
+				gl.vertexAttribPointer(vertexPositionAttributePointer, floorVertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+				gl.bindBuffer(gl.ARRAY_BUFFER, floorTextureBuffer);
+				gl.vertexAttribPointer(textureCoordAttributePointer, floorTextureBuffer.itemSize, gl.FLOAT, false, 0, 0);
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, floorIndexBuffer);
+
+				gl.drawElements(gl.TRIANGLES, floorIndexBuffer.itemSize, gl.UNSIGNED_SHORT, 0);
 			}
 
 			function redrawScene() {
