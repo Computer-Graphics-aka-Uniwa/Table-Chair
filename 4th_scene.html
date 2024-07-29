@@ -65,9 +65,9 @@
 			var skyTexture;
 			var floorTexture;
 
-			var floorVertexBuffer = new Float32Array(16);   
-			var floorIndexBuffer = new Float32Array(16);
-			var floorTextureBuffer = new Float32Array(16);
+			var floorVertexBuffer;   
+			var floorIndexBuffer;
+			var floorTextureBuffer;
 			
 
 			function createGLContext(inCanvas) {
@@ -228,11 +228,11 @@
 				var floorTextureURL = "textures/Floor_Texture.jpg";
 				preprocessTextureImage(floorTextureURL, floorTexture);
 
-				var floorVertices = ([
-					-25.0, -25.0, 0.0, 1.0,
-					25.0, -25.0, 0.0, 1.0,
-					25.0, 25.0, 0.0, 1.0,
-					-25.0, 25.0, 0.0, 1.0
+				var floorVertices = new Float32Array ([
+					25.0, 25.0, -8.0, 1.0,
+					-25.0, 25.0, -8.0, 1.0,
+					25.0, -25.0, -8.0, 1.0,
+					-25.0, -25.0, -8.0, 1.0
 				]);
 
 				floorVertexBuffer = gl.createBuffer();
@@ -241,7 +241,7 @@
 				floorVertexBuffer.itemSize = 4;
 				floorVertexBuffer.itemCount = 4;
 
-				var floorIndexMatrix = ([
+				var floorIndexMatrix = new Uint16Array ([
 					0, 1, 2,
 					1, 2, 3
 				]);
@@ -249,13 +249,13 @@
 				floorIndexBuffer = gl.createBuffer();
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, floorIndexBuffer);
 				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, floorIndexMatrix, gl.STATIC_DRAW);
-				floorIndexBuffer.itemSize = 6;
+				floorIndexBuffer.itemCount = 6;
 
-				var floorTextureCoords = ([
-					0.0, 1.0,
-					1.0, 0.0,
+				var floorTextureCoords = new Float32Array ([
 					0.0, 0.0,
-					1.0, 0.0
+					1.0, 0.0,
+					0.0, 1.0,
+					1.0, 1.0
 				]);
 
 				floorTextureBuffer = gl.createBuffer();
@@ -316,12 +316,12 @@
 				gl.uniform1i(uSamplerUniformPointer, 1);
 
 				// Σχεδιασμός Καρέκλας
-				drawComponent([-5.25, 4, -3], [0.25, 0.25, 3.75], textureBuffer);
-				drawComponent([-14.75, 4, -3], [0.25, 0.25, 3.75], textureBuffer);
-				drawComponent([-14.75, -5.5, -3], [0.25, 0.25, 3.75], textureBuffer);
-				drawComponent([-5.25, -5.5, -3], [0.25, 0.25, 3.75], textureBuffer);
-				drawComponent([-10, -0.75, 1], [5, 5, 0.25], textureBuffer);
-				drawComponent([-14.75, -0.75, 5], [0.25, 5, 3.75], textureBuffer);
+				drawComponent([-5.25, 4, -4], [0.25, 0.25, 3.75], textureBuffer);
+				drawComponent([-14.75, 4, -4], [0.25, 0.25, 3.75], textureBuffer);
+				drawComponent([-14.75, -5.5, -4], [0.25, 0.25, 3.75], textureBuffer);
+				drawComponent([-5.25, -5.5, -4], [0.25, 0.25, 3.75], textureBuffer);
+				drawComponent([-10, -0.75, 0], [5, 5, 0.25], textureBuffer);
+				drawComponent([-14.75, -0.75, 4], [0.25, 5, 3.75], textureBuffer);
 
 				// NEO 20. Ανάγνωση του buffer για τα texture coordinates του ουρανού
 				gl.activeTexture(gl.TEXTURE2);
@@ -342,9 +342,10 @@
 				gl.bindBuffer(gl.ARRAY_BUFFER, floorTextureBuffer);
 				gl.vertexAttribPointer(textureCoordAttributePointer, floorTextureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, floorIndexBuffer);
+				
 				glMatrix.mat4.identity(finalMatrix);
 				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
-				gl.drawElements(gl.TRIANGLES, floorIndexBuffer.itemSize, gl.UNSIGNED_SHORT, 0);
+				gl.drawElements(gl.TRIANGLES, floorIndexBuffer.itemCount, gl.UNSIGNED_SHORT, 0);
 			}
 
 			function drawComponent(localTranslationMatrix, localScalingMatrix, localTextureBuffer) {
