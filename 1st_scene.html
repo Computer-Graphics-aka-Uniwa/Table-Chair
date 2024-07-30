@@ -28,20 +28,25 @@
 			var gl;
 			var canvas;
 			var shadersProgram;
+			
 			var vertexPositionAttributePointer;
 			var vertexColorAttributePointer;
 			var verticesTransformUniformPointer;
+			
 			var vertexBuffer;
 			var colorBuffer;
 			var indexBuffer;
+			
 			var totalAngle = 0.0;
 			var requestID = 0;
 			var isRedraw = false;
+			
 			var viewMatrix = new Float32Array(16);
 			var perspectiveMatrix = new Float32Array(16);
 			var pvMatrix = new Float32Array(16);
 			var perspectiveViewUniformPointer;
-			var cameraPositionCoordinates = [0,0,0];
+			
+			var cameraPositionCoordinates = [0, 0, 0];
 
 			function createGLContext(inCanvas) {
 				var outContext = null;
@@ -89,32 +94,32 @@
 
 			function initBuffers() {
 				var cubePositions = new Float32Array ([
-					// Back
+					// Πίσω πλευρά
 					-1.0, -1.0, 1.0, 1.0,
         			1.0, -1.0, 1.0, 1.0,
         			1.0, 1.0, 1.0, 1.0,
         			-1.0, 1.0, 1.0, 1.0,
-					// Right
+					// Δεξιά πλευρά
 					1.0, -1.0, -1.0, 1.0,
 					1.0, -1.0, 1.0, 1.0,
 					1.0, 1.0, 1.0, 1.0,
 					1.0, 1.0, -1.0, 1.0,
-					// Front
+					// Μπροστινή πλευρά
 					1.0, -1.0, -1.0, 1.0,
 					-1.0, -1.0, -1.0, 1.0,
 					-1.0, 1.0, -1.0, 1.0,
 					1.0,  1.0, -1.0, 1.0,
-					// Left
+					// Αριστερή πλευρά
 					-1.0, -1.0, -1.0, 1.0,
 					-1.0, -1.0, 1.0, 1.0,
 					-1.0, 1.0, 1.0, 1.0,
 					-1.0, 1.0, -1.0, 1.0,
-					// Bottom
+					// Κάτω πλευρά
 					-1.0, -1.0, 1.0, 1.0,
 					1.0, -1.0, 1.0, 1.0,
 					1.0, -1.0, -1.0, 1.0,
 					-1.0, -1.0, -1.0, 1.0,
-					// Top
+					// Πάνω πλευρά
 					-1.0, 1.0, 1.0, 1.0,
 					1.0, 1.0, 1.0, 1.0,
 					1.0, 1.0, -1.0, 1.0,
@@ -128,32 +133,32 @@
 				vertexBuffer.numItems = 24;
 
 				var cubeColors = new Float32Array ([
-					// Back
+					// Πίσω πλευρά
 					0.0, 0.0, 0.3, 1.0,
 					0.0, 0.0, 0.3, 1.0,
 					0.0, 0.0, 0.3, 1.0,
 					0.0, 0.0, 0.3, 1.0,
-					// Right
+					// Δεξιά Πλευρά
 					0.0, 0.0, 0.1, 1.0,
 					0.0, 0.0, 0.1, 1.0,
 					0.0, 0.0, 0.1, 1.0,
 					0.0, 0.0, 0.1, 1.0,
-					// Front
+					// Μπροστινή Πλευρά
 					0.0, 0.0, 0.6, 1.0,
 					0.0, 0.0, 0.6, 1.0,
 					0.0, 0.0, 0.6, 1.0,
 					0.0, 0.0, 0.6, 1.0,
-					// Left
+					// Αριστερή Πλευρά
 					0.0, 0.0, 1.0, 1.0,
 					0.0, 0.0, 1.0, 1.0,
 					0.0, 0.0, 1.0, 1.0,
 					0.0, 0.0, 1.0, 1.0,
-					// Bottom
+					// Κάτω Πλευρά
 					0.0, 0.0, 0.8, 1.0,
 					0.0, 0.0, 0.8, 1.0,
 					0.0, 0.0, 0.8, 1.0,
 					0.0, 0.0, 0.8, 1.0,
-					// Top
+					// Πάνω Πλευρά
 					0.0, 0.0, 0.5, 1.0,
 					0.0, 0.0, 0.5, 1.0,
 					0.0, 0.0, 0.5, 1.0,
