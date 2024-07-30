@@ -7,27 +7,21 @@
 
 		<script id="vShader" type="x-shader/x-vertex">
 			attribute vec4 aVertexPosition;
-			// ΝΕΟ 4. Προσθήκη του attribute για τα texture coordinates
 			attribute vec2 aTextureCoord;
 			uniform mat4 uPerspectiveViewMatrix;
 			uniform mat4 uVerticesTransform;
-			// ΝΕΟ 5. Προσθήκη του varying για τα texture coordinates
 			varying vec2 vTextureCoord;
 			void main() {
 				gl_Position = uPerspectiveViewMatrix * uVerticesTransform * aVertexPosition;
-				// ΝΕΟ 6. Αντιγραφή των texture coordinates στο varying
 				vTextureCoord = aTextureCoord;
 			}
 		</script>
 
 		<script id="fShader" type="x-shader/x-vertex">
 			precision mediump float;
-			// ΝΕΟ 7. Προσθήκη του varying για τα texture coordinates
 			varying vec2 vTextureCoord;
-			// ΝΕΟ 8. Προσθήκη του sampler για την εικόνα
 			uniform sampler2D uSampler;
 			void main() {
-				// ΝΕΟ 9. Χρήση των texture coordinates για την ανάγνωση της εικόνας
 				gl_FragColor = texture2D(uSampler, vTextureCoord);
 			}
 		</script>
@@ -36,45 +30,52 @@
 			var gl;
 			var canvas;
 			var shadersProgram;
+			
 			var vertexPositionAttributePointer;
 			var vertexColorAttributePointer;
 			var verticesTransformUniformPointer;
+			
 			var vertexBuffer;
+			var indexBuffer;
+
 			var scalingMatrix = new Float32Array(16);
 			var translationMatrix = new Float32Array(16);
 			var rotationYMatrix = new Float32Array(16);
 			var finalMatrix = new Float32Array(16);
-			var indexBuffer;
+			
 			var totalAngle = 0.0;
+			// ΝΕΟ 1. Η συνολική μετατόπιση του ύψους της κάμερας στον άξονα z
 			var totalZ = 0.01;
+			
 			var requestID = 0;
 			var isRedraw = false;
+			
 			var viewMatrix = new Float32Array(16);
 			var perspectiveMatrix = new Float32Array(16);
 			var pvMatrix = new Float32Array(16);
+
 			var perspectiveViewUniformPointer;
 			var viewUniformPointer;
+
 			var cameraPositionCoordinates = [0,0,0];
-			// ΝΕΟ 10. Δήλωση των buffers για τα textures
+
 			var textureCoordAttributePointer;
-			// ΝΕΟ 11. Δήλωση του sampler pointer για την θέση του uniform στον fragment shader
 			var uSamplerUniformPointer;
-			// ΝΕΟ 12. Δήλωση του buffer για τα texture coordinates
+
 			var textureBuffer;
-			// ΝΕΟ 13. Δήλωση των texture
+
 			var tableTexture;
 			var chairTexture;
+			// ΝΕΟ 2. Δήλωση των texture για τον ουρανό και το πάτωμα
 			var skyTexture;
 			var floorTexture;
 
+			// ΝΕΟ 3. Δήλωση των buffer για το 2D πάτωμα
 			var floorVertexBuffer;   
 			var floorIndexBuffer;
 			var floorTextureBuffer;
 
-			var numberOfFrames;
-			var previousTime;
-			var currentTime;
-
+			// ΝΕΟ 4. Δήλωση των μεταβλητών για την κίνηση του ποντικιού
 			var mouseDown = false;
 			var deltaFresh = false;
 			var lastMouseX = null;
@@ -86,6 +87,7 @@
 			var rect;
 			var wheelRadiusFactor = 1;
 
+			// ΝΕΟ 5. Δήλωση των μεταβλητών για την κίνηση της καρέκλας
 			var timesChairDown = 0;
 			var timesChairUp = 0;
 			
@@ -129,42 +131,42 @@
 				gl.useProgram(shadersProgram);
 				vertexPositionAttributePointer = gl.getAttribLocation(shadersProgram, "aVertexPosition");
 				gl.enableVertexAttribArray(vertexPositionAttributePointer);
-				// ΝΕΟ 14. Ανάγνωση του attribute για τα texture coordinates
+
 				textureCoordAttributePointer = gl.getAttribLocation(shadersProgram, "aTextureCoord");
 				gl.enableVertexAttribArray(textureCoordAttributePointer);
 				verticesTransformUniformPointer = gl.getUniformLocation(shadersProgram, "uVerticesTransform");
-				// ΝΕΟ 15. Ανάγνωση του sampler για την εικόνα
+
 				uSamplerUniformPointer = gl.getUniformLocation(shadersProgram, "uSampler");
 			}
 
 			function initBuffers() {
 				var cubePositions = new Float32Array ([
-					// Back
+					// Πίσω πλευρά
 					-1.0, -1.0, 1.0, 1.0,
         			1.0, -1.0, 1.0, 1.0,
         			1.0, 1.0, 1.0, 1.0,
         			-1.0, 1.0, 1.0, 1.0,
-					// Right
+					// Δεξιά πλευρά
 					1.0, -1.0, -1.0, 1.0,
 					1.0, -1.0, 1.0, 1.0,
 					1.0, 1.0, 1.0, 1.0,
 					1.0, 1.0, -1.0, 1.0,
-					// Front
+					// Μπροστινή πλευρά
 					1.0, -1.0, -1.0, 1.0,
 					-1.0, -1.0, -1.0, 1.0,
 					-1.0, 1.0, -1.0, 1.0,
 					1.0,  1.0, -1.0, 1.0,
-					// Left
+					// Αριστερή πλευρά
 					-1.0, -1.0, -1.0, 1.0,
 					-1.0, -1.0, 1.0, 1.0,
 					-1.0, 1.0, 1.0, 1.0,
 					-1.0, 1.0, -1.0, 1.0,
-					// Bottom
+					// Κάτω πλευρά
 					-1.0, -1.0, 1.0, 1.0,
 					1.0, -1.0, 1.0, 1.0,
 					1.0, -1.0, -1.0, 1.0,
 					-1.0, -1.0, -1.0, 1.0,
-					// Top
+					// Πάνω πλευρά
 					-1.0, 1.0, 1.0, 1.0,
 					1.0, 1.0, 1.0, 1.0,
 					1.0, 1.0, -1.0, 1.0,
@@ -192,34 +194,33 @@
 				indexBuffer.itemSize = 1;
 				indexBuffer.numItems = 36;
 
-				// ΝΕΟ 16. Δημιουργία του buffer για τα texture coordinates
 				var textureCoordinates = new Float32Array([
-					// Back
+					// Πίσω πλευρά
 					0.0, 0.0,
 					1.0, 0.0,
 					1.0, 1.0,
 					0.0, 1.0,
-					// Right
+					// Δεξιά πλευρά
 					0.0, 0.0,
 					1.0, 0.0,
 					1.0, 1.0,
 					0.0, 1.0,
-					// Front
+					// Μπροστινή πλευρά
 					0.0, 0.0,
 					1.0, 0.0,
 					1.0, 1.0,
 					0.0, 1.0,
-					// Left
+					// Αριστερή πλευρά
 					0.0, 0.0,
 					1.0, 0.0,
 					1.0, 1.0,
 					0.0, 1.0,
-					// Bottom
+					// Κάτω πλευρά	
 					0.0, 0.0,
 					1.0, 0.0,
 					1.0, 1.0,
 					0.0, 1.0,
-					// Top
+					// Πάνω πλευρά
 					0.0, 0.0,
 					1.0, 0.0,
 					1.0, 1.0,
@@ -231,7 +232,6 @@
 				gl.bufferData(gl.ARRAY_BUFFER, textureCoordinates, gl.STATIC_DRAW);
 				textureBuffer.itemSize = 2;
 
-				// ΝΕΟ 17. Δημιουργία των texture
 				tableTexture = gl.createTexture();
 				var tableTextureURL = "textures/Table_Texture.jpg";
 				preprocessTextureImage(tableTextureURL, tableTexture);
@@ -240,6 +240,7 @@
 				var chairTextureURL = "textures/Chair_Texture.jpg";
 				preprocessTextureImage(chairTextureURL, chairTexture);
 
+				// ΝΕΟ 6. Προεπεξεργασία των texture του skybox και του πατώματος
 				skyboxTexture = gl.createTexture();
 				var skyboxTextureURL = "textures/Skybox_Texture.jpg";
 				preprocessTextureImage(skyboxTextureURL, skyboxTexture);
@@ -248,6 +249,7 @@
 				var floorTextureURL = "textures/Floor_Texture.jpg";
 				preprocessTextureImage(floorTextureURL, floorTexture);
 
+				// ΝΕΟ 7. Δημιουργία του vertex buffer για το 2D πάτωμα
 				var floorVertices = new Float32Array ([
 					25.0, 25.0, -8.0, 1.0,
 					-25.0, 25.0, -8.0, 1.0,
@@ -261,6 +263,7 @@
 				floorVertexBuffer.itemSize = 4;
 				floorVertexBuffer.itemCount = 4;
 
+				// ΝΕΟ 8. Δημιουργία του index matrix για το 2D πάτωμα
 				var floorIndexMatrix = new Uint16Array ([
 					0, 1, 2,
 					1, 2, 3
@@ -271,6 +274,7 @@
 				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, floorIndexMatrix, gl.STATIC_DRAW);
 				floorIndexBuffer.itemCount = 6;
 
+				// ΝΕΟ 9. Δημιουργία του buffer για τα texture coordinates του πατώματος
 				var floorTextureCoords = new Float32Array ([
 					0.0, 0.0,
 					1.0, 0.0,
@@ -284,7 +288,6 @@
 				floorTextureBuffer.itemSize = 2;
 			}
 
-			// ΝΕΟ 17.1 Custom συνάρτηση για σύνδεση αντικειμένου texture με εικόνα και προεπεξεργασία εικόνας
 			function preprocessTextureImage(imageURL, textureObject) {
 				var imageObject = new Image();
 				
@@ -303,6 +306,7 @@
 			function drawScene() {
 				gl.useProgram(shadersProgram);
 
+				// ΝΕΟ 10. Έλεγχος της κίνησης της καρέκλας με τη ροδέλα του ποντικιού
 				if (wheelRadiusFactor > 90) {
 					wheelRadiusFactor = 90;
 					if (timesChairDown == timesChairUp)
@@ -313,6 +317,7 @@
 						timesChairUp++;
 				}
 
+				// ΝΕΟ 11. Έλεγχος της κίνησης του ποντικιού
 				if ((mouseDown == true && deltaFresh == true) && (deltaMouseX != 0 && deltaMouseY != 0)) {
 					totalAngle += deltaMouseX * Math.PI / 180;
 					totalZ += deltaMouseY / 10;
@@ -339,7 +344,6 @@
 				perspectiveViewUniformPointer = gl.getUniformLocation(shadersProgram, "uPerspectiveViewMatrix");
 				gl.uniformMatrix4fv(perspectiveViewUniformPointer, false, pvMatrix);;
 
-				// ΝΕΟ 18. Ανάγνωση του buffer για τα texture coordinates του τραπεζιού
 				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, tableTexture);
 				gl.uniform1i(uSamplerUniformPointer, 0);
@@ -351,7 +355,6 @@
 				drawComponent([9.5, -9.5, 0], [0.5, 0.5, 7.5], textureBuffer, "table");
 				drawComponent([0, 0, 8], [10, 10, 0.5], textureBuffer, "table");
 
-				// ΝΕΟ 19. Ανάγνωση του buffer για τα texture coordinates της καρέκλας
 				gl.activeTexture(gl.TEXTURE1);
 				gl.bindTexture(gl.TEXTURE_2D, chairTexture);
 				gl.uniform1i(uSamplerUniformPointer, 1);
@@ -364,8 +367,9 @@
 				drawComponent([-10 + wheelRadiusFactor * 0.08, -0.75, 0 + wheelRadiusFactor * 0.15], [5, 5, 0.25], textureBuffer, "chair");
 				drawComponent([-14.75 + wheelRadiusFactor * 0.08, -0.75, 4 + wheelRadiusFactor * 0.15], [0.25, 5, 3.75], textureBuffer, "chair");
 
-				// Σχεδιασμός μπόνους καρέκλας
-				if (timesChairDown >= 1 && timesChairUp >= 1) {
+				// Σχεδιασμός συμμετρικής καρέκλας
+				// ΝΕΟ 12. Εφόσον η καρέκλα ανατραπεί 3 φορές, τότε να σχεδιαστεί η συμμετρική της και να ανατρέπεται επίσης με τη ροδέλα του ποντικιού
+				if (timesChairDown >= 3 && timesChairUp >= 3) {
 					drawComponent([5.25 - wheelRadiusFactor * 0.08, -4, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "mirrorChair");
 					drawComponent([14.75 - wheelRadiusFactor * 0.08, -4, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "mirrorChair");
 					drawComponent([14.75 - wheelRadiusFactor * 0.08, 5.5, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "mirrorChair");
@@ -374,7 +378,7 @@
 					drawComponent([14.75 - wheelRadiusFactor * 0.08, 0.75, 4 + wheelRadiusFactor * 0.15], [0.25, 5, 3.75], textureBuffer, "mirrorChair");
 				}
 
-				// NEO 20. Ανάγνωση του buffer για τα texture coordinates του ουρανού
+				// ΝΕΟ 13. Ενεργοποίηση του texture για τον ουρανό
 				gl.activeTexture(gl.TEXTURE2);
 				gl.bindTexture(gl.TEXTURE_2D, skyboxTexture);
 				gl.uniform1i(uSamplerUniformPointer, 2);
@@ -382,18 +386,20 @@
 				// Σχεδιασμός Ουρανού (skybox)
 				drawComponent([0, 0, 0], [500, 500, 500], textureBuffer, "skybox");
 
-				// NEO 21. Ανάγνωση του buffer για τα texture coordinates του πατώματος
+				// NEO 14. Ενεργοποίηση του texture για το πάτωμα
 				gl.activeTexture(gl.TEXTURE3);
 				gl.bindTexture(gl.TEXTURE_2D, floorTexture);
 				gl.uniform1i(uSamplerUniformPointer, 3);
 
 				// Σχεδιασμός Πατώματος 
+				// ΝΕΟ 15. Ενεργοποίηση των buffers του πατώματος
 				gl.bindBuffer(gl.ARRAY_BUFFER, floorVertexBuffer);
 				gl.vertexAttribPointer(vertexPositionAttributePointer, floorVertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				gl.bindBuffer(gl.ARRAY_BUFFER, floorTextureBuffer);
 				gl.vertexAttribPointer(textureCoordAttributePointer, floorTextureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, floorIndexBuffer);
 				
+				// ΝΕΟ 16. Σχεδιασμός του πατώματος
 				glMatrix.mat4.identity(finalMatrix);
 				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
 				gl.polygonOffset(-1.0,-1.0);
@@ -406,6 +412,8 @@
 				glMatrix.mat4.fromTranslation(translationMatrix, localTranslationMatrix);
 				glMatrix.mat4.fromScaling(scalingMatrix, localScalingMatrix);
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
+
+				// ΝΕΟ 17. Έλεχος της ανατροπής της καρέκλας με τη ροδέλα του ποντικιού
 				if (typeComponent == "chair") {
 					glMatrix.mat4.fromYRotation(rotationYMatrix, -wheelRadiusFactor * Math.PI / 180);
 					glMatrix.mat4.multiply(finalMatrix,  rotationYMatrix, finalMatrix);
@@ -468,7 +476,6 @@
 				drawScene();
 			}
 
-			// ΝΕΟ 0. Συνάρτηση για την εκτέλεση της κίνησης
 			function drawSceneWithAnimation() {
 				totalAngle += 0.01;
 				var r = Math.sqrt(cameraPositionCoordinates[0] * cameraPositionCoordinates[0] + cameraPositionCoordinates[1] * cameraPositionCoordinates[1]);
@@ -493,6 +500,7 @@
 				gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 				gl.enable(gl.DEPTH_TEST);
 
+				// ΝΕΟ 18. Ενεργοποίηση της ροής του ποντικιού
 				canvas.onmousedown = handleMouseDown;
 				window.onmouseup = handleMouseUp;
 				canvas.onmousemove = handleMouseMove;
@@ -502,6 +510,7 @@
 				drawScene();
 			}
 
+			// ΝΕΟ 19. Συναρτήσεις για την κίνηση του ποντικιού
 			function handleMouseDown(event) {
 				mouseDown = true;
 				lastMouseX = event.clientX - rect.left;
@@ -511,10 +520,12 @@
 				deltaFresh = true;
 			}
 
+			// ΝΕΟ 20. Συνάρτηση για την αναγνώριση της ανακοπής της κίνησης του ποντικιού
 			function handleMouseUp(event) {
     			mouseDown = false;
 			}
 
+			// ΝΕΟ 21. Συνάρτηση για την κίνηση του ποντικιού
 			function handleMouseMove(event) {
 				currMouseX = event.clientX - rect.left;
 				currMouseY = rect.bottom - event.clientY;
@@ -534,6 +545,7 @@
 				lastMouseY = currMouseY;
 			}
 
+			// ΝΕΟ 22. Συνάρτηση για την κίνηση της ροδέλας του ποντικιού
 			function handleMouseWheel(event) {
 				if (event.deltaY > 0)
 					wheelRadiusFactor = wheelRadiusFactor + 0.5;
@@ -545,19 +557,16 @@
 				}
 			}
 
-			// ΝΕΟ 1. Συνάρτηση για εκκίνηση της κίνησης
 			function startAnimation() {
 				if (requestID == 0)
 					requestID = window.requestAnimationFrame(animationStep);
 			}
 
-			// ΝΕΟ 2. Συνάρτηση για την εκτέλεση της κίνησης
 			function animationStep() {
 				drawSceneWithAnimation();
 				requestID = window.requestAnimationFrame(animationStep);
 			}
 
-			// ΝΕΟ 3. Συνάρτηση για την διακοπή της κίνησης
 			function stopAnimation() {
 				window.cancelAnimationFrame(requestID);
 				requestID = 0;

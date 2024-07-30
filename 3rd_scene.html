@@ -49,8 +49,9 @@
 			var finalMatrix = new Float32Array(16);
 			
 			var totalAngle = 0.0;
-			var requestID = 0;
 			var isRedraw = false;
+			// ΝΕΟ 7. Δήλωση του animation flag που σηματοδοτεί αν η κίνηση είναι ενεργή ή όχι
+			var requestID = 0;
 			
 			var viewMatrix = new Float32Array(16);
 			var perspectiveMatrix = new Float32Array(16);
@@ -61,13 +62,13 @@
 			
 			var cameraPositionCoordinates = [0,0,0];
 			
-			// ΝΕΟ 7. Δήλωση των buffers για τα textures
+			// ΝΕΟ 8. Δήλωση των buffers για τα textures
 			var textureCoordAttributePointer;
-			// ΝΕΟ 8. Δήλωση του sampler pointer για την θέση του uniform στον fragment shader
+			// ΝΕΟ 9. Δήλωση του sampler pointer για την θέση του uniform στον fragment shader
 			var uSamplerUniformPointer;
-			// ΝΕΟ 9. Δήλωση του buffer για τα texture coordinates
+			// ΝΕΟ 10. Δήλωση του buffer για τα texture coordinates
 			var textureBuffer;
-			// ΝΕΟ 10. Δήλωση των texture
+			// ΝΕΟ 11. Δήλωση των texture
 			var tableTexture;
 			var chairTexture;
 			
@@ -111,11 +112,11 @@
 				gl.useProgram(shadersProgram);
 				vertexPositionAttributePointer = gl.getAttribLocation(shadersProgram, "aVertexPosition");
 				gl.enableVertexAttribArray(vertexPositionAttributePointer);
-				// ΝΕΟ 11. Ανάγνωση του attribute για τα texture coordinates
+				// ΝΕΟ 12. Ανάγνωση του attribute για τα texture coordinates
 				textureCoordAttributePointer = gl.getAttribLocation(shadersProgram, "aTextureCoord");
 				gl.enableVertexAttribArray(textureCoordAttributePointer);
 				verticesTransformUniformPointer = gl.getUniformLocation(shadersProgram, "uVerticesTransform");
-				// ΝΕΟ 12. Ανάγνωση του sampler για την εικόνα
+				// ΝΕΟ 13. Ανάγνωση του sampler για την εικόνα
 				uSamplerUniformPointer = gl.getUniformLocation(shadersProgram, "uSampler");
 			}
 
@@ -175,7 +176,7 @@
 				indexBuffer.itemSize = 1;
 				indexBuffer.numItems = 36;
 
-				// ΝΕΟ 16. Δημιουργία του buffer για τα texture coordinates
+				// ΝΕΟ 14. Δημιουργία του buffer για τα texture coordinates
 				var textureCoordinates = new Float32Array([
 					// Πίσω πλευρά
 					0.0, 0.0,
@@ -214,7 +215,7 @@
 				gl.bufferData(gl.ARRAY_BUFFER, textureCoordinates, gl.STATIC_DRAW);
 				textureBuffer.itemSize = 2;
 
-				// ΝΕΟ 17. Δημιουργία των texture
+				// ΝΕΟ 15. Προεπεξεργασία των texture
 				tableTexture = gl.createTexture();
 				var tableTextureURL = "textures/Table_Texture.jpg";
 				preprocessTextureImage(tableTextureURL, tableTexture);
@@ -224,7 +225,7 @@
 				preprocessTextureImage(chairTextureURL, chairTexture);
 			}
 
-			// ΝΕΟ 17.1 Custom συνάρτηση για σύνδεση αντικειμένου texture με εικόνα και προεπεξεργασία εικόνας
+			// ΝΕΟ 16.1 Custom συνάρτηση για σύνδεση αντικειμένου texture με εικόνα και προεπεξεργασία εικόνας
 			function preprocessTextureImage(imageURL, textureObject) {
 				var imageObject = new Image();
 				
@@ -258,7 +259,7 @@
 				perspectiveViewUniformPointer = gl.getUniformLocation(shadersProgram, "uPerspectiveViewMatrix");
 				gl.uniformMatrix4fv(perspectiveViewUniformPointer, false, pvMatrix);;
 
-				// ΝΕΟ 18. Ανάγνωση του buffer για τα texture coordinates του τραπεζιού
+				// ΝΕΟ 17. Ανάγνωση του buffer για τα texture coordinates του τραπεζιού
 				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, tableTexture);
 				gl.uniform1i(uSamplerUniformPointer, 0);
@@ -270,7 +271,7 @@
 				drawTableChair([9.5, -9.5, 0], [0.5, 0.5, 7.5], textureBuffer);
 				drawTableChair([0, 0, 8], [10, 10, 0.5], textureBuffer);
 
-				// ΝΕΟ 19. Ανάγνωση του buffer για τα texture coordinates της καρέκλας
+				// ΝΕΟ 18. Ανάγνωση του buffer για τα texture coordinates της καρέκλας
 				gl.activeTexture(gl.TEXTURE1);
 				gl.bindTexture(gl.TEXTURE_2D, chairTexture);
 				gl.uniform1i(uSamplerUniformPointer, 1);
@@ -343,7 +344,7 @@
 				drawScene();
 			}
 
-			// ΝΕΟ 20. Συνάρτηση για την εκτέλεση της κίνησης
+			// ΝΕΟ 19. Συνάρτηση για την εκτέλεση της κίνησης
 			function drawSceneWithAnimation() {
 				totalAngle += 0.01;
 				var r = Math.sqrt(cameraPositionCoordinates[0] * cameraPositionCoordinates[0] + cameraPositionCoordinates[1] * cameraPositionCoordinates[1]);
@@ -370,19 +371,19 @@
 				drawScene();
 			}
 
-			// ΝΕΟ 21. Συνάρτηση για εκκίνηση της κίνησης
+			// ΝΕΟ 20. Συνάρτηση για εκκίνηση της κίνησης
 			function startAnimation() {
 				if (requestID == 0)
 					requestID = window.requestAnimationFrame(animationStep);
 			}
 
-			// ΝΕΟ 22. Συνάρτηση για την εκτέλεση της κίνησης
+			// ΝΕΟ 21. Συνάρτηση για την εκτέλεση της κίνησης
 			function animationStep() {
 				drawSceneWithAnimation();
 				requestID = window.requestAnimationFrame(animationStep);
 			}
 
-			// ΝΕΟ 23. Συνάρτηση για την διακοπή της κίνησης
+			// ΝΕΟ 22. Συνάρτηση για την διακοπή της κίνησης
 			function stopAnimation() {
 				window.cancelAnimationFrame(requestID);
 				requestID = 0;
