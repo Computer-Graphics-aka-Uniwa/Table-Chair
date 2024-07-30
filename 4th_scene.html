@@ -350,12 +350,12 @@
 				gl.uniform1i(uSamplerUniformPointer, 1);
 
 				// Σχεδιασμός Καρέκλας
-				drawComponent([-5.25, 4 - wheelRadiusFactor * 0.1, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "chair");
-				drawComponent([-14.75, 4 - wheelRadiusFactor * 0.1, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "chair");
-				drawComponent([-14.75, -5.5 - wheelRadiusFactor * 0.1, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "chair");
-				drawComponent([-5.25, -5.5 - wheelRadiusFactor * 0.1, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "chair");
-				drawComponent([-10, -0.75 - wheelRadiusFactor * 0.1, 0 + wheelRadiusFactor * 0.15], [5, 5, 0.25], textureBuffer, "chair");
-				drawComponent([-14.75, -0.75 - wheelRadiusFactor * 0.1, 4 + wheelRadiusFactor * 0.15], [0.25, 5, 3.75], textureBuffer, "chair");
+				drawComponent([-5.25 + wheelRadiusFactor * 0.08, 4, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "chair");
+				drawComponent([-14.75 + wheelRadiusFactor * 0.08, 4, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "chair");
+				drawComponent([-14.75 + wheelRadiusFactor * 0.08, -5.5, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "chair");
+				drawComponent([-5.25 + wheelRadiusFactor * 0.08, -5.5, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "chair");
+				drawComponent([-10 + wheelRadiusFactor * 0.08, -0.75, 0 + wheelRadiusFactor * 0.15], [5, 5, 0.25], textureBuffer, "chair");
+				drawComponent([-14.75 + wheelRadiusFactor * 0.08, -0.75, 4 + wheelRadiusFactor * 0.15], [0.25, 5, 3.75], textureBuffer, "chair");
 
 				// NEO 20. Ανάγνωση του buffer για τα texture coordinates του ουρανού
 				gl.activeTexture(gl.TEXTURE2);
