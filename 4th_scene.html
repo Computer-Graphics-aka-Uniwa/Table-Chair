@@ -85,6 +85,9 @@
 			var deltaMouseY = 0;
 			var rect;
 			var wheelRadiusFactor = 1;
+
+			var timesChairDown = 0;
+			var timesChairUp = 0;
 			
 
 			function createGLContext(inCanvas) {
@@ -302,8 +305,12 @@
 
 				if (wheelRadiusFactor > 90) {
 					wheelRadiusFactor = 90;
+					if (timesChairDown == timesChairUp)
+						timesChairDown++;
 				} else if (wheelRadiusFactor < 0) {
 					wheelRadiusFactor = 0;
+					if (timesChairDown > timesChairUp)
+						timesChairUp++;
 				}
 
 				if ((mouseDown == true && deltaFresh == true) && (deltaMouseX != 0 && deltaMouseY != 0)) {
@@ -357,6 +364,16 @@
 				drawComponent([-10 + wheelRadiusFactor * 0.08, -0.75, 0 + wheelRadiusFactor * 0.15], [5, 5, 0.25], textureBuffer, "chair");
 				drawComponent([-14.75 + wheelRadiusFactor * 0.08, -0.75, 4 + wheelRadiusFactor * 0.15], [0.25, 5, 3.75], textureBuffer, "chair");
 
+				// Σχεδιασμός μπόνους καρέκλας
+				if (timesChairDown >= 1 && timesChairUp >= 1) {
+					drawComponent([5.25 - wheelRadiusFactor * 0.08, -4, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "mirrorChair");
+					drawComponent([14.75 - wheelRadiusFactor * 0.08, -4, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "mirrorChair");
+					drawComponent([14.75 - wheelRadiusFactor * 0.08, 5.5, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "mirrorChair");
+					drawComponent([5.25 - wheelRadiusFactor * 0.08, 5.5, -4 + wheelRadiusFactor * 0.15], [0.25, 0.25, 3.75], textureBuffer, "mirrorChair");
+					drawComponent([10 - wheelRadiusFactor * 0.08, 0.75, 0 + wheelRadiusFactor * 0.15], [5, 5, 0.25], textureBuffer, "mirrorChair");
+					drawComponent([14.75 - wheelRadiusFactor * 0.08, 0.75, 4 + wheelRadiusFactor * 0.15], [0.25, 5, 3.75], textureBuffer, "mirrorChair");
+				}
+
 				// NEO 20. Ανάγνωση του buffer για τα texture coordinates του ουρανού
 				gl.activeTexture(gl.TEXTURE2);
 				gl.bindTexture(gl.TEXTURE_2D, skyboxTexture);
@@ -391,6 +408,9 @@
 				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
 				if (typeComponent == "chair") {
 					glMatrix.mat4.fromYRotation(rotationYMatrix, -wheelRadiusFactor * Math.PI / 180);
+					glMatrix.mat4.multiply(finalMatrix,  rotationYMatrix, finalMatrix);
+				} else if (typeComponent == "mirrorChair") {
+					glMatrix.mat4.fromYRotation(rotationYMatrix, wheelRadiusFactor * Math.PI / 180);
 					glMatrix.mat4.multiply(finalMatrix,  rotationYMatrix, finalMatrix);
 				}
 				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
