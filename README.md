@@ -52,7 +52,7 @@
 
 ---
 
-## Project Overview
+# Project Overview
 
 This project demonstrates the incremental development of a **3D graphics environment using WebGL**. It was developed as a semester project for the **Computer Graphics** course at the **University of West Attica (UNIWA)**.  
 The implementation progresses through multiple stages, starting from basic geometric primitives and evolving into an interactive, animated, and textured 3D scene.
@@ -163,10 +163,8 @@ The implementation progresses through multiple stages, starting from basic geome
 This project showcases a step-by-step approach to building a fully interactive 3D WebGL scene. Through progressive development, it combines geometric modeling, transformations, animation, texture mapping, and user interaction, providing a solid practical foundation in modern computer graphics programming.
 
 ---
----
----
 
-## Installation and Run Guide
+# Installation and Run Guide
 
 This project is a **pure WebGL (HTML + JavaScript)** application and does **not require compilation** or external build tools.  
 It runs directly in a modern web browser with **WebGL support**.
