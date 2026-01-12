@@ -164,7 +164,7 @@ This project showcases a step-by-step approach to building a fully interactive 3
 
 ---
 
-# Installation and Run Guide
+## Installation and Run Guide
 
 This project is a **pure WebGL (HTML + JavaScript)** application and does **not require compilation** or external build tools.  
 It runs directly in a modern web browser with **WebGL support**.
@@ -219,7 +219,9 @@ http-server
 ```
 Open the displayed local URL and load the scene you desire.
 
-### Controls and Interaction (Scene 1)
+## Controls and Interaction
+
+### Scene 1
 
 Camera Controls
 
@@ -241,7 +243,7 @@ Interaction Notes
 - No mouse interaction is required
 - Camera changes apply immediately after redraw
 
-### Controls and Interaction (Scene 2)
+### Scene 2
 
 Camera Controls
 
@@ -263,7 +265,7 @@ Interaction Notes
 - The table and chair are positioned using fixed transformations
 - No real-time interaction or animation is present
 
-### Controls and Interaction (Scene 3)
+### Scene 3
 
 Camera Controls
 
@@ -286,7 +288,7 @@ Interaction Notes
 - Texture changes are loaded automatically on scene initialization
 
 
-### Controls and Interaction (Scene 4)
+### Scene 4
 
 Camera Controls
 
@@ -304,6 +306,8 @@ Camera Controls
   Redraw: Re-renders the scene with the selected parameters
   Start / Stop: Enables or disables automatic camera rotation
 
+## Textures
+
 ### Texture and Asset Notes
 All textures are located in:
 ```bash
@@ -316,6 +320,8 @@ Texture characteristics:
 These constraints ensure:
 - Correct mipmap generation
 - Prevention of black-texture rendering issues in WebGL
+
+## Issues and Evaluation
 
 ### Common Issues & Troubleshooting
 ❌ Scene appears black or textures do not load
@@ -348,7 +354,7 @@ macOS
 
 ### Notes for Academic Evaluation
 
-- No external frameworks (e.g., Three.js) were used
+- No external frameworks were used
 - All transformations, animations, textures, and interactions are implemented using:
   - Raw WebGL API
   - glMatrix library
