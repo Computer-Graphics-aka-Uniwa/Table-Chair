@@ -323,30 +323,18 @@ These constraints ensure:
 
 ## Issues and Evaluation
 
-### Common Issues & Troubleshooting
-❌ Scene appears black or textures do not load
+### Scene appears black or textures do not load
+- Ensure the project is served via HTTP, not opened directly as a file.
 
-✔ Ensure the project is served via HTTP, not opened directly as a file.
+### Mouse interaction not responding
+- Click inside the canvas first to activate mouse focus.
 
-❌ Mouse interaction not responding
+### WebGL not supported error
 
-✔ Click inside the canvas first to activate mouse focus.
+- Verify WebGL is enabled in your browser:
 
-❌ WebGL not supported error
-
-✔ Verify WebGL is enabled in your browser:
-
-- Chrome: `chrome://gpu`
-
-- Firefox: `about:support`
-
-### Supported Platforms
-
-Windows 10 / 11
-
-Linux
-
-macOS
+  - Chrome: `chrome://gpu`
+  - Firefox: `about:support`
 
 ### Tested Successfully On
 
@@ -356,7 +344,15 @@ macOS
 
 - No external frameworks were used
 - All transformations, animations, textures, and interactions are implemented using:
-  - Raw WebGL API
-  - glMatrix library
+  - `Raw WebGL API`
+  - `glMatrix library`
 
 The project fully complies with the Computer Graphics course requirements at UNIWA
+
+---
+
+## Open the Documentation
+1. Navigate to the `docs/` directory
+2. Open the report corresponding to your preferred language:
+    - English: `3D-Graphics-Scene-using-WebGL.pdf`
+    - Greek: `3D-Σκηνή-με-WebGL.pdf`
