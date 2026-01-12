@@ -163,6 +163,8 @@ The implementation progresses through multiple stages, starting from basic geome
 This project showcases a step-by-step approach to building a fully interactive 3D WebGL scene. Through progressive development, it combines geometric modeling, transformations, animation, texture mapping, and user interaction, providing a solid practical foundation in modern computer graphics programming.
 
 ---
+---
+---
 
 ## Installation and Run Guide
 
