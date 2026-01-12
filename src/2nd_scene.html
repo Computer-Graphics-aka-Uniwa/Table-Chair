@@ -9,9 +9,11 @@
 			attribute vec4 aVertexPosition;
 			attribute vec4 aVertexColor;
 			uniform mat4 uPerspectiveViewMatrix;
+			uniform mat4 uVerticesTransform;
 			varying vec4 vColor;
 			void main() {
-				gl_Position = uPerspectiveViewMatrix * aVertexPosition;
+				// NEW 4. Multiply the view matrix by the vertex position
+				gl_Position = uPerspectiveViewMatrix * uVerticesTransform * aVertexPosition;
 				vColor = aVertexColor;
 			}
 		</script>
@@ -34,19 +36,30 @@
 			var verticesTransformUniformPointer;
 			
 			var vertexBuffer;
-			var colorBuffer;
 			var indexBuffer;
+			// NEW 1. Addition of new color buffers for coloring the table
+			var redColorBuffer;
+			var greenColorBuffer;
+			var blueColorBuffer; // PART 1. Renamed the cube's colorBuffer to blueColorBuffer
+			var yellowColorBuffer;
+			var pinkColorBuffer;
 			
+			// NEW 2. Addition of scaling, translation matrix with their multiplication to the final
+			var scalingMatrix = new Float32Array(16);
+			var translationMatrix = new Float32Array(16);
+			var finalMatrix = new Float32Array(16);
+
 			var totalAngle = 0.0;
 			var requestID = 0;
 			var isRedraw = false;
-			
 			var viewMatrix = new Float32Array(16);
 			var perspectiveMatrix = new Float32Array(16);
 			var pvMatrix = new Float32Array(16);
 			var perspectiveViewUniformPointer;
 			
-			var cameraPositionCoordinates = [0, 0, 0];
+			// NEW 3. Addition of the view uniform pointer
+			var viewUniformPointer;
+			var cameraPositionCoordinates = [0,0,0];
 
 			function createGLContext(inCanvas) {
 				var outContext = null;
@@ -94,32 +107,32 @@
 
 			function initBuffers() {
 				var cubePositions = new Float32Array ([
-					// Πίσω πλευρά
+					// Back side
 					-1.0, -1.0, 1.0, 1.0,
         			1.0, -1.0, 1.0, 1.0,
         			1.0, 1.0, 1.0, 1.0,
         			-1.0, 1.0, 1.0, 1.0,
-					// Δεξιά πλευρά
+					// Right side
 					1.0, -1.0, -1.0, 1.0,
 					1.0, -1.0, 1.0, 1.0,
 					1.0, 1.0, 1.0, 1.0,
 					1.0, 1.0, -1.0, 1.0,
-					// Μπροστινή πλευρά
+					// Front side
 					1.0, -1.0, -1.0, 1.0,
 					-1.0, -1.0, -1.0, 1.0,
 					-1.0, 1.0, -1.0, 1.0,
 					1.0,  1.0, -1.0, 1.0,
-					// Αριστερή πλευρά
+					// Left side
 					-1.0, -1.0, -1.0, 1.0,
 					-1.0, -1.0, 1.0, 1.0,
 					-1.0, 1.0, 1.0, 1.0,
 					-1.0, 1.0, -1.0, 1.0,
-					// Κάτω πλευρά
+					// Bottom side
 					-1.0, -1.0, 1.0, 1.0,
 					1.0, -1.0, 1.0, 1.0,
 					1.0, -1.0, -1.0, 1.0,
 					-1.0, -1.0, -1.0, 1.0,
-					// Πάνω πλευρά
+					// Top side
 					-1.0, 1.0, 1.0, 1.0,
 					1.0, 1.0, 1.0, 1.0,
 					1.0, 1.0, -1.0, 1.0,
@@ -132,44 +145,195 @@
 				vertexBuffer.itemSize = 4;
 				vertexBuffer.numItems = 24;
 
-				var cubeColors = new Float32Array ([
-					// Πίσω πλευρά
+				// NEW 1.1 Color buffer with shades of red color
+				var redColors = new Float32Array ([
+					// Back side	
+					0.3, 0.0, 0.0, 1.0,
+					0.3, 0.0, 0.0, 1.0,
+					0.3, 0.0, 0.0, 1.0,
+					0.3, 0.0, 0.0, 1.0,
+					// Right side
+					0.1, 0.0, 0.0, 1.0,
+					0.1, 0.0, 0.0, 1.0,
+					0.1, 0.0, 0.0, 1.0,
+					0.1, 0.0, 0.0, 1.0,
+					// Front side
+					0.6, 0.0, 0.0, 1.0,
+					0.6, 0.0, 0.0, 1.0,
+					0.6, 0.0, 0.0, 1.0,
+					0.6, 0.0, 0.0, 1.0,
+					// Left side
+					1.0, 0.0, 0.0, 1.0,
+					1.0, 0.0, 0.0, 1.0,
+					1.0, 0.0, 0.0, 1.0,
+					1.0, 0.0, 0.0, 1.0,
+					// Bottom side
+					0.8, 0.0, 0.0, 1.0,
+					0.8, 0.0, 0.0, 1.0,
+					0.8, 0.0, 0.0, 1.0,
+					0.8, 0.0, 0.0, 1.0,
+					// Top side
+					0.5, 0.0, 0.0, 1.0,
+					0.5, 0.0, 0.0, 1.0,
+					0.5, 0.0, 0.0, 1.0,
+					0.5, 0.0, 0.0, 1.0
+				]);
+
+				redColorBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, redColorBuffer);
+				gl.bufferData(gl.ARRAY_BUFFER, redColors, gl.STATIC_DRAW);
+				redColorBuffer.itemSize = 4;
+				redColorBuffer.numItems = 24;
+
+				// NEW 1.2 Color buffer with shades of green color
+				var greenColors = new Float32Array ([
+					// Back side
+					0.0, 0.3, 0.0, 1.0,
+					0.0, 0.3, 0.0, 1.0,
+					0.0, 0.3, 0.0, 1.0,
+					0.0, 0.3, 0.0, 1.0,
+					// Right side
+					0.0, 0.1, 0.0, 1.0,
+					0.0, 0.1, 0.0, 1.0,
+					0.0, 0.1, 0.0, 1.0,
+					0.0, 0.1, 0.0, 1.0,
+					// Front side
+					0.0, 0.6, 0.0, 1.0,
+					0.0, 0.6, 0.0, 1.0,
+					0.0, 0.6, 0.0, 1.0,
+					0.0, 0.6, 0.0, 1.0,
+					// Left side
+					0.0, 1.0, 0.0, 1.0,
+					0.0, 1.0, 0.0, 1.0,
+					0.0, 1.0, 0.0, 1.0,
+					0.0, 1.0, 0.0, 1.0,
+					// Bottom side
+					0.0, 0.8, 0.0, 1.0,
+					0.0, 0.8, 0.0, 1.0,
+					0.0, 0.8, 0.0, 1.0,
+					0.0, 0.8, 0.0, 1.0,
+					// Top side
+					0.0, 0.5, 0.0, 1.0,
+					0.0, 0.5, 0.0, 1.0,
+					0.0, 0.5, 0.0, 1.0,
+					0.0, 0.5, 0.0, 1.0
+				]);
+
+				greenColorBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, greenColorBuffer);
+				gl.bufferData(gl.ARRAY_BUFFER, greenColors, gl.STATIC_DRAW);
+				greenColorBuffer.itemSize = 4;
+				greenColorBuffer.numItems = 24;
+				
+				// PART 1.1 Simple renaming from cubeColors to blueColors
+				var blueColors = new Float32Array ([
+					// Back side
 					0.0, 0.0, 0.3, 1.0,
 					0.0, 0.0, 0.3, 1.0,
 					0.0, 0.0, 0.3, 1.0,
 					0.0, 0.0, 0.3, 1.0,
-					// Δεξιά Πλευρά
+					// Right side
 					0.0, 0.0, 0.1, 1.0,
 					0.0, 0.0, 0.1, 1.0,
 					0.0, 0.0, 0.1, 1.0,
 					0.0, 0.0, 0.1, 1.0,
-					// Μπροστινή Πλευρά
+					// Front side
 					0.0, 0.0, 0.6, 1.0,
 					0.0, 0.0, 0.6, 1.0,
 					0.0, 0.0, 0.6, 1.0,
 					0.0, 0.0, 0.6, 1.0,
-					// Αριστερή Πλευρά
+					// Left side
 					0.0, 0.0, 1.0, 1.0,
 					0.0, 0.0, 1.0, 1.0,
 					0.0, 0.0, 1.0, 1.0,
 					0.0, 0.0, 1.0, 1.0,
-					// Κάτω Πλευρά
+					// Bottom side
 					0.0, 0.0, 0.8, 1.0,
 					0.0, 0.0, 0.8, 1.0,
 					0.0, 0.0, 0.8, 1.0,
 					0.0, 0.0, 0.8, 1.0,
-					// Πάνω Πλευρά
+					// Top side
 					0.0, 0.0, 0.5, 1.0,
 					0.0, 0.0, 0.5, 1.0,
 					0.0, 0.0, 0.5, 1.0,
 					0.0, 0.0, 0.5, 1.0
 				]);
 
-				colorBuffer = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-				gl.bufferData(gl.ARRAY_BUFFER, cubeColors, gl.STATIC_DRAW);
-				colorBuffer.itemSize = 4;
-				colorBuffer.numItems = 24;
+				blueColorBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, blueColorBuffer);
+				gl.bufferData(gl.ARRAY_BUFFER, blueColors, gl.STATIC_DRAW);
+				blueColorBuffer.itemSize = 4;
+				blueColorBuffer.numItems = 24;
+
+				// NEW 1.3 Color buffer with shades of yellow color
+				var yellowColors = new Float32Array([
+					// Back side
+					1.0, 1.0, 0.0, 1.0,
+					1.0, 1.0, 0.0, 1.0,
+					1.0, 1.0, 0.0, 1.0,
+					1.0, 1.0, 0.0, 1.0,
+					// Front side
+					0.8, 0.8, 0.0, 1.0,
+					0.8, 0.8, 0.0, 1.0,
+					0.8, 0.8, 0.0, 1.0,
+					0.8, 0.8, 0.0, 1.0,
+					// Left side
+					0.6, 0.6, 0.0, 1.0,
+					0.6, 0.6, 0.0, 1.0,
+					0.6, 0.6, 0.0, 1.0,
+					0.6, 0.6, 0.0, 1.0,
+					// Bottom side
+					0.4, 0.4, 0.0, 1.0,
+					0.4, 0.4, 0.0, 1.0,
+					0.4, 0.4, 0.0, 1.0,
+					0.4, 0.4, 0.0, 1.0,
+					// Top side
+					0.2, 0.2, 0.0, 1.0,
+					0.2, 0.2, 0.0, 1.0,
+					0.2, 0.2, 0.0, 1.0,
+					0.2, 0.2, 0.0, 1.0
+				]);
+
+				yellowColorBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, yellowColorBuffer);
+				gl.bufferData(gl.ARRAY_BUFFER, yellowColors, gl.STATIC_DRAW);
+				yellowColorBuffer.itemSize = 4;
+				yellowColorBuffer.numItems = 24;
+
+				// NEW 1.4 Color buffer with shades of pink color
+				var pinkColors = new Float32Array([
+					// Back side
+					1.0, 0.75, 0.8, 1.0,
+					1.0, 0.75, 0.8, 1.0,
+					1.0, 0.75, 0.8, 1.0,
+					1.0, 0.75, 0.8, 1.0,
+					// Front side
+					1.0, 0.5, 0.6, 1.0,
+					1.0, 0.5, 0.6, 1.0,
+					1.0, 0.5, 0.6, 1.0,
+					1.0, 0.5, 0.6, 1.0,
+					// Left side
+					1.0, 0.25, 0.4, 1.0,
+					1.0, 0.25, 0.4, 1.0,
+					1.0, 0.25, 0.4, 1.0,
+					1.0, 0.25, 0.4, 1.0,
+					// Bottom side
+					1.0, 0.1, 0.3, 1.0,
+					1.0, 0.1, 0.3, 1.0,
+					1.0, 0.1, 0.3, 1.0,
+					1.0, 0.1, 0.3, 1.0,
+					// Top side
+					1.0, 0.0, 0.2, 1.0,
+					1.0, 0.0, 0.2, 1.0,
+					1.0, 0.0, 0.2, 1.0,
+					1.0, 0.0, 0.2, 1.0
+				]);
+
+				pinkColorBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, pinkColorBuffer);
+				gl.bufferData(gl.ARRAY_BUFFER, pinkColors, gl.STATIC_DRAW);
+				pinkColorBuffer.itemSize = 4;
+				pinkColorBuffer.numItems = 24;
 
 				indexBuffer = gl.createBuffer();
 				var indexMatrix = new Uint16Array ([
@@ -196,10 +360,7 @@
 				gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 				gl.vertexAttribPointer(vertexPositionAttributePointer, vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				
-				gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-				gl.vertexAttribPointer(vertexColorAttributePointer, colorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-				
-				// Σε περίπτωση που ο χρήστης δεν πατάει το κουμπί "Επανασχεδίασε" βάλε τις default τιμές
+				// In case the user is not pressing the "Redraw" button, set the default values
 				if (!isRedraw) {
 					glMatrix.mat4.lookAt(viewMatrix, [9,9,9], [0,0,0], [0,0,1]);
 					glMatrix.mat4.perspective(perspectiveMatrix, 80 * Math.PI / 180, 1, 0.01, 1000);
@@ -207,7 +368,51 @@
 				glMatrix.mat4.multiply(pvMatrix, perspectiveMatrix, viewMatrix);
 
 				perspectiveViewUniformPointer = gl.getUniformLocation(shadersProgram, "uPerspectiveViewMatrix");
-				gl.uniformMatrix4fv(perspectiveViewUniformPointer, false, pvMatrix);
+				gl.uniformMatrix4fv(perspectiveViewUniformPointer, false, pvMatrix);;
+
+				// Drawing Table
+				// NEW 2.1 Drawing the red leg of the table
+				drawTableChair([9.5, 9.5, 0], [0.5, 0.5, 7.5], redColorBuffer);
+
+				// NEW 2.2 Drawing the green leg of the table
+				drawTableChair([-9.5, 9.5, 0], [0.5, 0.5, 7.5], greenColorBuffer);
+
+				// NEW 2.3 Drawing the blue leg of the table
+				drawTableChair([-9.5, -9.5, 0], [0.5, 0.5, 7.5], blueColorBuffer);
+
+				// NEW 2.4 Drawing the yellow leg of the table
+				drawTableChair([9.5, -9.5, 0], [0.5, 0.5, 7.5], yellowColorBuffer);
+
+				// NEW 2.5 Drawing the pink surface of the table
+				drawTableChair([0, 0, 8], [10, 10, 0.5], pinkColorBuffer);
+
+				// Drawing Chair
+				// NEW 2.6 Drawing the first green leg of the chair
+				drawTableChair([-5.25, 4, -3], [0.25, 0.25, 3.75], greenColorBuffer);
+
+				// NEW 2.7 Drawing the second green leg of the chair
+				drawTableChair([-14.75, 4, -3], [0.25, 0.25, 3.75], greenColorBuffer);
+
+				// NEW 2.8 Drawing the third green leg of the chair
+				drawTableChair([-14.75, -5.5, -3], [0.25, 0.25, 3.75], greenColorBuffer);
+
+				// NEW 2.9 Drawing the fourth green leg of the chair
+				drawTableChair([-5.25, -5.5, -3], [0.25, 0.25, 3.75], greenColorBuffer);
+
+				// NEW 2.10 Drawing the green surface of the chair
+				drawTableChair([-10, -0.75, 1], [5, 5, 0.25], greenColorBuffer);
+
+				// NEW 2.11 Drawing the red backrest of the chair
+				drawTableChair([-14.75, -0.75, 5], [0.25, 5, 3.75], redColorBuffer);
+			}
+
+			function drawTableChair(localTranslationMatrix, localScalingMatrix, localColorBuffer) {
+				glMatrix.mat4.fromTranslation(translationMatrix, localTranslationMatrix);
+				glMatrix.mat4.fromScaling(scalingMatrix, localScalingMatrix);
+				glMatrix.mat4.multiply(finalMatrix, translationMatrix, scalingMatrix);
+				gl.uniformMatrix4fv(verticesTransformUniformPointer, false, finalMatrix);
+				gl.bindBuffer(gl.ARRAY_BUFFER, localColorBuffer);
+				gl.vertexAttribPointer(vertexColorAttributePointer, localColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				gl.drawElements(gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 			}
 
@@ -245,9 +450,12 @@
 					case 'RBB': // Right-Back-Bottom
 						cameraPositionCoordinates = [viewDistance, -viewDistance, -viewDistance];
 						break;
+					default:
+						cameraPositionCoordinates = [9, 9, 9];
+						break;
 				}
 				
-				// Ζωγραφίζουμε ξανά την σκηνή με τις επιλεγμένες τιμές του χρήστη
+				// Redrawing the scene with the selected user values
 				glMatrix.mat4.lookAt(viewMatrix, cameraPositionCoordinates, [0,0,0], [0,0,1]);
 				glMatrix.mat4.perspective(perspectiveMatrix, viewAngle * Math.PI / 180, 1, 0.01, viewAngle * 100);
 				isRedraw = true;
@@ -273,11 +481,11 @@
 	<body onload="main()">
 		<canvas id="sceneCanvas"></canvas>
 		<p>
-			Γωνία θέασης (σε μοίρες): <input type="text" id="viewAngleTxt" value="0" autocomplete="off">
-			Ορθογώνια απόσταση της κάμερας: <input type="text" id="viewDistanceTxt" value="0" autocomplete="off">
+			View angle (in degrees): <input type="text" id="viewAngleTxt" value="90" autocomplete="off">
+			Orthogonal distance of the camera: <input type="text" id="viewDistanceTxt" value="20" autocomplete="off">
 		</p>
 		<p>
-			Θέση κάμερας: 
+			Camera position: 
 			<input type="radio" id="LFT" name="cameraPosition" value="LFT" checked>
 			<label for="LFT">Left-Front-Top</label>
 			<input type="radio" id="LFB" name="cameraPosition" value="LFB">
@@ -296,7 +504,7 @@
 			<label for="RBB">Right-Back-Bottom</label>
 		</p>
 		<p>
-			<button id="drawSceneButton" onclick="redrawScene()">Επανασχεδίασε</button>
+			<button id="drawSceneButton" onclick="redrawScene()">Redraw</button>
 		</p>
 	</body>
 </html>
