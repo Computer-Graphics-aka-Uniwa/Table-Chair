@@ -8,6 +8,11 @@
   DEPARTMENT OF COMPUTER ENGINEERING AND INFORMATICS
 </p>
 
+<p align="center">
+  <a href="https://www.uniwa.gr" target="_blank">University of West Attica</a> ·
+  <a href="https://ice.uniwa.gr" target="_blank">Department of Computer Engineering and Informatics</a>
+</p>
+
 <hr/>
 
 <p align="center">
@@ -29,6 +34,15 @@
 </p>
 
 <p align="center">
+  <strong>Antonios Kokkinos</strong><br>
+  Student ID: 20390107
+</p>
+
+<p align="center">
+  <a href="https://github.com/KokkinosAntonios" target="_blank">GitHub</a>
+</p>
+
+<p align="center">
   <strong>Pantelis Tatsis</strong><br>
   Student ID: 20390226
 </p>
@@ -38,6 +52,12 @@
   <a href="https://www.linkedin.com/in/pantelis-tatsis-8287852a2/" target="_blank">LinkedIn</a>
 </p>
 
+<hr>
+
+<p align="center">
+  <strong>Supervision</strong>
+</p>
+
 <p align="center">
   Supervisor: Georgios Bardis, Assistant Professor
 </p>
@@ -45,6 +65,9 @@
   <a href="https://ice.uniwa.gr/en/emd_person/georgios-bardis/" target="_blank">UNIWA Profile</a>
 </p>
 
+</hr>
+
+---
 
 <p align="center">
   Athens, July 2024
@@ -52,7 +75,15 @@
 
 ---
 
-# Project Overview
+<p align="center">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2ucmdAju5MLVQg4nm-x5ZguP512FUmlGY0w&s" width="250"/>
+</p>
+
+---
+
+# README
+
+## Building a 3D Graphics Scene Using WebGL
 
 This project demonstrates the incremental development of a **3D graphics environment using WebGL**. It was developed as a semester project for the **Computer Graphics** course at the **University of West Attica (UNIWA)**.  
 The implementation progresses through multiple stages, starting from basic geometric primitives and evolving into an interactive, animated, and textured 3D scene.
@@ -61,34 +92,33 @@ The implementation progresses through multiple stages, starting from basic geome
 
 ## Table of Contents
 
-| Section | Folder / File | Description |
-|------:|---------------|-------------|
-| 1 | `assign/` | Project assignment material |
-| 1.1 | `assign/project_2023-2024.pdf` | Assignment description in English |
-| 1.2 | `assign/εργασία_2023-2024.pdf` | Assignment description in Greek |
-| 2 | `docs/` | Project documentation |
-| 2.1 | `docs/3D-Graphics-Scene-using-WebGL.pdf` | Documentation in English |
-| 2.2 | `docs/3D-Σκηνή-με-WebGL.pdf` | Documentation in Greek |
-| 3 | `src/` | WebGL source code and assets |
-| 3.1 | `src/textures/` | Texture images used in the 3D scenes |
-| 3.1.1 | `Chair_Texture.jpg` | Chair texture |
-| 3.1.2 | `Floor_Texture.jpg` | Floor texture |
-| 3.1.3 | `Skybox_Texture.jpg` | Skybox texture |
-| 3.1.4 | `Table_Texture.jpg` | Table texture |
-| 3.2 | `src/WebGL-Libraries/` | External WebGL helper libraries |
-| 3.2.1 | `gl-matrix-min.js` | Matrix and vector mathematics library |
-| 3.2.2 | `webgl-debug.js` | WebGL debugging utilities |
-| 3.3 | `src/1st_scene.html` | First WebGL 3D scene |
-| 3.4 | `src/2nd_scene.html` | Second WebGL 3D scene |
-| 3.5 | `src/3rd_scene.html` | Third WebGL 3D scene |
-| 3.6 | `src/4th_scene.html` | Fourth WebGL 3D scene |
-| 4 | `README.md` | Repository overview and usage instructions |
+| Section | Folder / File                            | Description                           |
+| ------: | ---------------------------------------- | ------------------------------------- |
+|       1 | `assign/`                                | Project assignment material           |
+|     1.1 | `assign/project_2023-2024.pdf`           | Assignment description in English     |
+|     1.2 | `assign/εργασία_2023-2024.pdf`           | Assignment description in Greek       |
+|       2 | `docs/`                                  | Project documentation                 |
+|     2.1 | `docs/3D-Graphics-Scene-using-WebGL.pdf` | Documentation in English              |
+|     2.2 | `docs/3D-Σκηνή-με-WebGL.pdf`             | Documentation in Greek                |
+|       3 | `src/`                                   | WebGL source code and assets          |
+|     3.1 | `src/textures/`                          | Texture images used in the 3D scenes  |
+|   3.1.1 | `Chair_Texture.jpg`                      | Chair texture                         |
+|   3.1.2 | `Floor_Texture.jpg`                      | Floor texture                         |
+|   3.1.3 | `Skybox_Texture.jpg`                     | Skybox texture                        |
+|   3.1.4 | `Table_Texture.jpg`                      | Table texture                         |
+|     3.2 | `src/WebGL-Libraries/`                   | External WebGL helper libraries       |
+|   3.2.1 | `gl-matrix-min.js`                       | Matrix and vector mathematics library |
+|   3.2.2 | `webgl-debug.js`                         | WebGL debugging utilities             |
+|     3.3 | `src/1st_scene.html`                     | First WebGL 3D scene                  |
+|     3.4 | `src/2nd_scene.html`                     | Second WebGL 3D scene                 |
+|     3.5 | `src/3rd_scene.html`                     | Third WebGL 3D scene                  |
+|     3.6 | `src/4th_scene.html`                     | Fourth WebGL 3D scene                 |
+|       4 | `README.md`                              | Project documentation                 |
+|       5 | `INSTALL.md`                             | Usage instructions                    |
 
 ---
 
-## Technical Features
-
-### Scene 1: Foundations
+## 1. Scene 1: Foundations
 
 - **Cube Formation:**  
   Implementation of a 3D cube using vertex buffers and color buffers.
@@ -101,25 +131,25 @@ The implementation progresses through multiple stages, starting from basic geome
 
 ---
 
-### Scene 2: Geometric Transformations
+## 2. Scene 2: Geometric Transformations
 
 - **Object Modeling:**  
   Transformation of the initial cube into more complex composite objects, including:
-  - Table  
-  - Stool  
-  - Chair  
+  - Table
+  - Stool
+  - Chair
 
 - **Matrix Operations:**  
   Extensive use of transformation matrices such as:
-  - `fromTranslation()`  
-  - `fromScaling()`  
-  - `multiply()`  
+  - `fromTranslation()`
+  - `fromScaling()`
+  - `multiply()`
 
   These operations enable precise assembly of multi-part objects from simple geometric components.
 
 ---
 
-### Scene 3: Animation and Realism
+## 3. Scene 3: Animation and Realism
 
 - **Dynamic Motion:**  
   Start and pause controls allow users to activate or stop camera rotation. Rotation is implemented using trigonometric functions (`Math.cos()` and `Math.sin()`).
@@ -129,13 +159,13 @@ The implementation progresses through multiple stages, starting from basic geome
 
 ---
 
-### Scene 4: Environment and Interaction
+## 4. Scene 4: Environment and Interaction
 
 - **World Building:**  
   A **Skybox** is implemented as the background environment, along with a 2D floor that displays the developers’ names.
 
-- **Mouse Interaction:**  
-  - Mouse movement controls the animation speed.  
+- **Mouse Interaction:**
+  - Mouse movement controls the animation speed.
   - Mouse wheel input allows the user to tip the chair forward.
 
 - **Easter Egg:**  
@@ -143,14 +173,14 @@ The implementation progresses through multiple stages, starting from basic geome
 
 ---
 
-## Challenges and Solutions
+## 5. Challenges and Solutions
 
 - **Buffer Alignment:**  
   Considerable testing was required to ensure that individual object components (e.g., table legs, chair back) aligned correctly without visible gaps.
 
 - **Texture Loading Issues:**  
   Problems where objects rendered as black were resolved by:
-  - Ensuring texture images had **power-of-two dimensions**  
+  - Ensuring texture images had **power-of-two dimensions**
   - Correctly configuring texture buffers and parameters in WebGL
 
 - **Interaction Physics:**  
@@ -158,201 +188,6 @@ The implementation progresses through multiple stages, starting from basic geome
 
 ---
 
-## Conclusion
+## 6. Conclusion
 
 This project showcases a step-by-step approach to building a fully interactive 3D WebGL scene. Through progressive development, it combines geometric modeling, transformations, animation, texture mapping, and user interaction, providing a solid practical foundation in modern computer graphics programming.
-
----
-
-# Installation and Run Guide
-
-This project is a **pure WebGL (HTML + JavaScript)** application and does **not require compilation** or external build tools.  
-It runs directly in a modern web browser with **WebGL support**.
-
----
-
-## Prerequisites
-
-Before running the project, ensure the following requirements are met.
-
-### Software Requirements
-- **Modern Web Browser** with WebGL enabled:
-  - Google Chrome 
-  - Mozilla Firefox (recommended)
-  - Microsoft Edge
-- **Local HTTP Server (required for texture loading)**
-
-> **Important**  
-> Due to browser security restrictions, WebGL **cannot load textures correctly** when HTML files are opened directly (`file://`).  
-> A **local web server is mandatory**.
-
----
-
-## Repository Setup
-
-### Clone the Repository
-
-```bash
-git clone https://github.com/Computer-Graphics-aka-Uniwa/Table-Chair.git
-```
-
-Alternatively, download the repository as a ZIP archive and extract it locally.
-
-### Running the Project
-Option 1: Using VS Code Live Server (Recommended)
-1. Open the project folder in Visual Studio Code
-2. Install the Live Server extension
-3. Navigate to:
-```bash
-src/*_scene.html
-```
-4. Right-click the file and select "Open with Live Server"
-5. The scene you chose will open automatically in your default browser
-
-### Using Node.js HTTP Server
-
-If Node.js is installed:
-```bash
-npm install -g http-server
-cd Table-Chair/src
-http-server
-```
-Open the displayed local URL and load the scene you desire.
-
-## Controls and Interaction
-
-### Scene 1
-
-Camera Controls
-
-- **View Angle**  
-  Adjusts the camera’s field of view (degrees)
-
-- **Orthogonal Distance**  
-  Controls the distance of the camera from the scene center
-
-- **Camera Position (Radio Buttons)**  
-  Select predefined camera viewpoints around the object
-
-- **Redraw**  
-  Re-renders the scene with the selected parameters
-
-Interaction Notes
-
-- Scene 1 is static and does not support animation
-- No mouse interaction is required
-- Camera changes apply immediately after redraw
-
-### Scene 2
-
-Camera Controls
-
-- **View Angle**  
-  Adjusts the camera’s field of view (degrees)
-
-- **Orthogonal Distance**  
-  Controls the distance of the camera from the scene center
-
-- **Camera Position (Radio Buttons)**  
-  Select predefined camera viewpoints
-
-- **Redraw**  
-  Re-renders the scene with the selected parameters
-
-Interaction Notes
-
-- Scene 2 remains static
-- The table and chair are positioned using fixed transformations
-- No real-time interaction or animation is present
-
-### Scene 3
-
-Camera Controls
-
-- **View Angle**  
-  Adjusts the camera’s field of view (degrees)
-
-- **Orthogonal Distance**  
-  Controls the distance of the camera from the scene center
-
-- **Camera Position (Radio Buttons)**  
-  Select predefined camera viewpoints
-
-- **Redraw**  
-  Re-renders the scene with the selected parameters
-
-Interaction Notes
-
-- Scene 3 introduces textured objects but remains static
-- No mouse-based interaction is required
-- Texture changes are loaded automatically on scene initialization
-
-
-### Scene 4
-
-Camera Controls
-
-- **Mouse Drag**
-  Horizontal movement → Rotate camera around the scene
-  Vertical movement → Move camera height (Z-axis)
-
-- **Mouse Wheel**
-  Tilt the chair forward and backward (0°–90°)
-
-- **UI Controls**
-  View Angle: Adjusts the camera’s field of view (degrees)
-  Orthogonal Distance: Controls camera distance from the scene center
-  Camera Position (Radio Buttons): Select predefined camera viewpoints
-  Redraw: Re-renders the scene with the selected parameters
-  Start / Stop: Enables or disables automatic camera rotation
-
-## Textures
-
-### Texture and Asset Notes
-All textures are located in:
-```bash
-src/textures/
-```
-Texture characteristics:
-- JPEG format
-- Power-of-two dimensions (e.g., 512×512)
-
-These constraints ensure:
-- Correct mipmap generation
-- Prevention of black-texture rendering issues in WebGL
-
-## Issues and Evaluation
-
-### Scene appears black or textures do not load
-- Ensure the project is served via HTTP, not opened directly as a file.
-
-### Mouse interaction not responding
-- Click inside the canvas first to activate mouse focus.
-
-### WebGL not supported error
-
-- Verify WebGL is enabled in your browser:
-
-  - Chrome: `chrome://gpu`
-  - Firefox: `about:support`
-
-### Tested Successfully On
-
-- Mozilla Firefox
-
-### Notes for Academic Evaluation
-
-- No external frameworks were used
-- All transformations, animations, textures, and interactions are implemented using:
-  - `Raw WebGL API`
-  - `glMatrix library`
-
-The project fully complies with the Computer Graphics course requirements at UNIWA
-
----
-
-## Open the Documentation
-1. Navigate to the `docs/` directory
-2. Open the report corresponding to your preferred language:
-    - English: `3D-Graphics-Scene-using-WebGL.pdf`
-    - Greek: `3D-Σκηνή-με-WebGL.pdf`
